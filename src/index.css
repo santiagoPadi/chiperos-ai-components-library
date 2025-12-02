@@ -1,0 +1,17 @@
+/* Agrega aquí los estilos base de Tailwind si es necesario */
+@import "tailwindcss";
+
+/* Animaciones para Loader */
+@keyframes linear-progress {
+  0% {
+    transform: translateX(-100%);
+    width: 30%;
+  }
+  50% {
+    width: 70%;
+  }
+  100% {
+    transform: translateX(400%);
+    width: 30%;
+  }
+}

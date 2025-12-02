@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: chiperos-ai-storybook
+    env: static
+    buildCommand: |
+      npm ci
+      npm run build-storybook
+    staticPublishPath: ./storybook-static
+    headers:
+      # Cache para assets estáticos (JS, CSS, imágenes)
+      - path: /static/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+      # Cache para otras páginas (1 hora)
+      - path: /*
+        name: Cache-Control
+        value: public, max-age=3600
+      # Security headers
+      - path: /*
+        name: X-Frame-Options
+        value: SAMEORIGIN
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: X-XSS-Protection
+        value: 1; mode=block
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+

@@ -1,0 +1,51 @@
+# Source files
+src/
+.storybook/
+
+# Config files
+vite.config.ts
+tsconfig.json
+tsconfig.node.json
+tailwind.config.js
+
+# Tests
+*.test.tsx
+*.test.ts
+*.spec.tsx
+*.spec.ts
+__tests__/
+coverage/
+
+# Documentation (keep README.md)
+*_SUMMARY.md
+*_GUIDE.md
+RENAME_SUMMARY.md
+NPM_PUBLISH_GUIDE.md
+KPI_CARDS_ANALYSIS.md
+
+# Development
+node_modules/
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# CI/CD
+.github/
+
+# Yarn
+yarn.lock
+
+# Package lock (keep one)
+package-lock.json
+
