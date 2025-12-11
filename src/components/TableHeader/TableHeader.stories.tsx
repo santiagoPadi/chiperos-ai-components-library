@@ -422,3 +422,57 @@ export const CustomCards: Story = {
   },
 };
 
+export const WithPrimaryDropdown: Story = {
+  render: () => {
+    const [bulkAction, setBulkAction] = useState('');
+
+    const buttons: TableHeaderButton[] = [
+      {
+        label: 'Actions',
+        variant: 'primary',
+        isDropdown: true,
+        dropdownLabel: 'Bulk',
+        dropdownOptions: [
+          { id: 'approve', text: 'Approve Selected' },
+          { id: 'reject', text: 'Reject Selected' },
+          { id: 'archive', text: 'Archive Selected' },
+          { id: 'delete', text: 'Delete Selected' },
+        ],
+        dropdownValue: bulkAction,
+        onDropdownChange: (value) => {
+          setBulkAction(value);
+          alert(`Bulk action: ${value}`);
+        },
+      },
+      {
+        label: 'Export',
+        variant: 'primary',
+        isDropdown: true,
+        dropdownLabel: 'Format',
+        dropdownOptions: [
+          { id: 'csv', text: 'Export as CSV' },
+          { id: 'excel', text: 'Export as Excel' },
+          { id: 'pdf', text: 'Export as PDF' },
+        ],
+        onDropdownChange: (value) => alert(`Export as: ${value}`),
+      },
+    ];
+
+    return (
+      <div>
+        <TableHeader
+          searchPlaceholder="Search users..."
+          buttons={buttons}
+          showButtons
+          showFilters={false}
+        />
+        
+        <div style={{ marginTop: '16px', padding: '12px', backgroundColor: '#f4f4f4', borderRadius: '4px' }}>
+          <strong>Selected Bulk Action:</strong> {bulkAction || 'None'}
+        </div>
+      </div>
+    );
+  },
+  args: {},
+};
+

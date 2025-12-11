@@ -63,6 +63,11 @@ export interface TableHeaderButton {
   dropdownValue?: string;
   
   /**
+   * Label for dropdown (shown above value when variant is primary)
+   */
+  dropdownLabel?: string;
+  
+  /**
    * Click handler for regular button
    */
   onClick?: () => void;
@@ -257,10 +262,12 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                   /* Dropdown Button */
                   <div className="relative">
                     <Select
+                      variant={button.variant === 'primary' ? 'primary' : 'default'}
                       options={button.dropdownOptions}
                       value={button.dropdownValue}
                       onChange={(value) => button.onDropdownChange?.(value)}
                       placeholder={button.label}
+                      label={button.dropdownLabel}
                       className={cn(
                         'h-11',
                         button.variant === 'outline'

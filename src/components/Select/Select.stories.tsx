@@ -447,36 +447,40 @@ export const PrimaryDisabled: Story = {
 };
 
 export const PrimaryLongOptions: Story = {
-  render: () => {
+  render: (args) => {
     const [value, setValue] = useState('');
-    
+
     const longOptions: SelectOption[] = [
       { id: '1', text: 'Download all data as comprehensive Excel report' },
       { id: '2', text: 'Export filtered results to CSV format' },
       { id: '3', text: 'Generate PDF summary for stakeholders' },
       { id: '4', text: 'Send data directly to connected integrations' },
     ];
-    
+
     return (
       <div style={{ display: 'flex', justifyContent: 'flex-end', width: '400px' }}>
         <Select
           variant="primary"
           options={longOptions}
           placeholder="Actions"
+          label={args.label}
           value={value}
           onChange={setValue}
         />
       </div>
     );
   },
-  args: { options: [] },
+  args: { 
+    options: [],
+    label: '',
+  },
 };
 
 export const VariantsComparison: Story = {
-  render: () => {
+  render: (args) => {
     const [defaultValue, setDefaultValue] = useState('');
     const [primaryValue, setPrimaryValue] = useState('');
-    
+
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', width: '400px' }}>
         <div>
@@ -485,11 +489,12 @@ export const VariantsComparison: Story = {
             variant="default"
             options={exportOptions}
             placeholder="Select an option"
+            label={args.label}
             value={defaultValue}
             onChange={setDefaultValue}
           />
         </div>
-        
+
         <div>
           <h3 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Primary Variant (Button Style)</h3>
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
@@ -497,6 +502,7 @@ export const VariantsComparison: Story = {
               variant="primary"
               options={exportOptions}
               placeholder="Export"
+              label={args.label}
               value={primaryValue}
               onChange={setPrimaryValue}
             />
@@ -505,18 +511,21 @@ export const VariantsComparison: Story = {
       </div>
     );
   },
-  args: { options: [] },
+  args: { 
+    options: [],
+    label: '',
+  },
 };
 
 export const PrimaryInHeader: Story = {
-  render: () => {
+  render: (args) => {
     const [exportValue, setExportValue] = useState('');
     const [actionValue, setActionValue] = useState('');
-    
+
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
         alignItems: 'center',
         padding: '16px 24px',
         backgroundColor: '#f8f8f8',
@@ -524,12 +533,13 @@ export const PrimaryInHeader: Story = {
         width: '600px',
       }}>
         <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 600 }}>Users List</h2>
-        
+
         <div style={{ display: 'flex', gap: '12px' }}>
           <Select
             variant="primary"
             options={actionOptions}
             placeholder="Bulk Actions"
+            label={args.label}
             value={actionValue}
             onChange={setActionValue}
           />
@@ -537,6 +547,7 @@ export const PrimaryInHeader: Story = {
             variant="primary"
             options={exportOptions}
             placeholder="Export"
+            label={args.label}
             value={exportValue}
             onChange={setExportValue}
           />
@@ -544,6 +555,9 @@ export const PrimaryInHeader: Story = {
       </div>
     );
   },
-  args: { options: [] },
+  args: { 
+    options: [],
+    label: '',
+  },
 };
 
