@@ -1,6 +1,5 @@
 import React from 'react';
 import { cn } from '../../lib/utils';
-import { Input } from '../Input';
 import { Select, SelectOption } from '../Select';
 import { Button } from '../ButtonRadix';
 import { ListFilter, Search, ChevronDown } from 'lucide-react';
@@ -322,7 +321,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                 ) : (
                   /* Regular Button */
                   <Button
-                    variant={button.variant === 'outline' ? 'outline' : 'primary'}
+                    variant={button.variant === 'outline' ? 'secondary' : 'primary'}
                     onClick={button.onClick}
                     className="h-11"
                   >

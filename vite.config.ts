@@ -29,13 +29,30 @@ export default defineConfig({
       fileName: (format) => `chiperos-ai-components-library.${format === 'es' ? 'js' : 'cjs'}`,
     },
     rollupOptions: {
-      // Asegúrate de externalizar las dependencias que no deben estar en el bundle
-      external: ['react', 'react-dom', 'tailwindcss'],
+      // Externalizar React, sus submódulos y todas las dependencias que usan React
+      external: [
+        'react',
+        'react-dom',
+        'react/jsx-runtime',
+        'react/jsx-dev-runtime',
+        'react-dom/client',
+        'tailwindcss',
+        // Externalizar dependencias que usan React para evitar duplicados
+        '@radix-ui/react-radio-group',
+        '@radix-ui/react-slot',
+        '@radix-ui/react-switch',
+        'lucide-react',
+        'next-intl',
+        'radix-ui',
+      ],
       output: {
         // Proporciona nombres globales para las dependencias externalizadas
         globals: {
           react: 'React',
           'react-dom': 'ReactDOM',
+          'react/jsx-runtime': 'jsxRuntime',
+          'react/jsx-dev-runtime': 'jsxDevRuntime',
+          'react-dom/client': 'ReactDOMClient',
           tailwindcss: 'tailwindcss',
         },
       },

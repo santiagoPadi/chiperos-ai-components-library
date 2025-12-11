@@ -1,8 +1,17 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Table, TableColumn } from './index';
+import { Table, TableColumn, TableProps } from './index';
 import { useState } from 'react';
 
-const meta = {
+// Sample data
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  status: string;
+}
+
+const meta: Meta<TableProps<User>> = {
   title: 'Components/Table',
   component: Table,
   parameters: {
@@ -35,19 +44,10 @@ const meta = {
       description: 'Message shown when no data',
     },
   },
-} satisfies Meta<typeof Table>;
+};
 
 export default meta;
-type Story = StoryObj<typeof meta>;
-
-// Sample data
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  role: string;
-  status: string;
-}
+type Story = StoryObj<TableProps<User>>;
 
 const sampleUsers: User[] = [
   { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Admin', status: 'Active' },
@@ -177,9 +177,19 @@ export const WithTwoLineCell: Story = {
   },
 };
 
-export const ManyColumns: Story = {
-  args: {
-    columns: [
+interface ExtendedUser {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  department: string;
+  role: string;
+}
+
+export const ManyColumns: StoryObj<TableProps<ExtendedUser>> = {
+  render: () => {
+    const columns: TableColumn<ExtendedUser>[] = [
       { key: 'id', label: 'ID' },
       { key: 'firstName', label: 'First Name' },
       { key: 'lastName', label: 'Last Name' },
@@ -187,8 +197,9 @@ export const ManyColumns: Story = {
       { key: 'phone', label: 'Phone' },
       { key: 'department', label: 'Department' },
       { key: 'role', label: 'Role' },
-    ],
-    data: [
+    ];
+    
+    const data: ExtendedUser[] = [
       {
         id: 1,
         firstName: 'John',
@@ -207,8 +218,15 @@ export const ManyColumns: Story = {
         department: 'Marketing',
         role: 'Manager',
       },
-    ],
-    showPagination: false,
+    ];
+    
+    return (
+      <Table
+        columns={columns}
+        data={data}
+        showPagination={false}
+      />
+    );
   },
 };
 
