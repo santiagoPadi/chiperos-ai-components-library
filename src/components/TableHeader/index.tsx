@@ -215,86 +215,37 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
         </div>
       )}
       
-      {/* Search Field */}
-      <div
-        className="relative"
-        data-testid="table-header-search"
-      >
-        <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
-          <Search size={16} className="text-[#312e4d]" />
-        </div>
-        <input
-          type="text"
-          value={searchValue}
-          onChange={(e) => onSearchChange?.(e.target.value)}
-          placeholder={searchPlaceholder}
-          className={cn(
-            'w-full h-11 pl-10 pr-4 py-3',
-            'border border-[#ecebf0] rounded',
-            'text-base leading-5',
-            'placeholder:text-[#a29fba]',
-            'focus:outline-none focus:border-[#a29fba]',
-            'transition-colors'
-          )}
-          data-testid="table-header-search-input"
-        />
-      </div>
-      
-      {/* Filters and Buttons Row */}
+      {/* Search Field and Buttons Row */}
       <div className="flex gap-4 items-center w-full">
-        {/* Filters */}
-        {showFilters && filters.length > 0 && (
-          <div
-            className="flex gap-4 items-center"
-            data-testid="table-header-filters"
-          >
-            {/* "Filter by" label */}
-            <div className="flex items-center gap-2 py-3">
-              <ListFilter size={16} className="text-[#312e4d]" />
-              <span className="text-base leading-5 text-[#312e4d]">
-                Filter by
-              </span>
-            </div>
-            
-            {/* Filter dropdowns */}
-            {filters.map((filter, index) => (
-              <div
-                key={filter.key}
-                className="min-w-[120px]"
-                data-testid={`table-header-filter-${index}`}
-              >
-                {filter.options && filter.options.length > 0 ? (
-                  <Select
-                    options={filter.options}
-                    value={filter.value}
-                    onChange={(value) => filter.onChange?.(value)}
-                    placeholder={filter.placeholder || filter.label}
-                    className="h-11"
-                  />
-                ) : (
-                  <button
-                    className={cn(
-                      'flex items-center gap-2',
-                      'border border-[#ecebf0] rounded',
-                      'px-4 py-3 h-11',
-                      'text-base leading-5 text-[#312e4d]',
-                      'hover:border-[#a29fba] transition-colors'
-                    )}
-                    onClick={() => filter.onChange?.('')}
-                  >
-                    <span>{filter.placeholder || filter.label}</span>
-                    <ChevronDown size={16} />
-                  </button>
-                )}
-              </div>
-            ))}
+        {/* Search Field */}
+        <div
+          className="relative flex-1"
+          data-testid="table-header-search"
+        >
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
+            <Search size={16} className="text-[#312e4d]" />
           </div>
-        )}
+          <input
+            type="text"
+            value={searchValue}
+            onChange={(e) => onSearchChange?.(e.target.value)}
+            placeholder={searchPlaceholder}
+            className={cn(
+              'w-full h-11 pl-10 pr-4 py-3',
+              'border border-[#ecebf0] rounded',
+              'text-base leading-5',
+              'placeholder:text-[#a29fba]',
+              'focus:outline-none focus:border-[#a29fba]',
+              'transition-colors'
+            )}
+            data-testid="table-header-search-input"
+          />
+        </div>
         
         {/* Buttons */}
         {showButtons && buttons.length > 0 && (
           <div
-            className="flex gap-4 items-center ml-auto"
+            className="flex gap-4 items-center shrink-0"
             data-testid="table-header-buttons"
           >
             {buttons.map((button, index) => (
@@ -333,6 +284,55 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
           </div>
         )}
       </div>
+      
+      {/* Filters Row */}
+      {showFilters && filters.length > 0 && (
+        <div
+          className="flex gap-4 items-center"
+          data-testid="table-header-filters"
+        >
+          {/* "Filter by" label */}
+          <div className="flex items-center gap-2 py-3">
+            <ListFilter size={16} className="text-[#312e4d]" />
+            <span className="text-base leading-5 text-[#312e4d]">
+              Filter by
+            </span>
+          </div>
+          
+          {/* Filter dropdowns */}
+          {filters.map((filter, index) => (
+            <div
+              key={filter.key}
+              className="min-w-[120px]"
+              data-testid={`table-header-filter-${index}`}
+            >
+              {filter.options && filter.options.length > 0 ? (
+                <Select
+                  options={filter.options}
+                  value={filter.value}
+                  onChange={(value) => filter.onChange?.(value)}
+                  placeholder={filter.placeholder || filter.label}
+                  className="h-11"
+                />
+              ) : (
+                <button
+                  className={cn(
+                    'flex items-center gap-2',
+                    'border border-[#ecebf0] rounded',
+                    'px-4 py-3 h-11',
+                    'text-base leading-5 text-[#312e4d]',
+                    'hover:border-[#a29fba] transition-colors'
+                  )}
+                  onClick={() => filter.onChange?.('')}
+                >
+                  <span>{filter.placeholder || filter.label}</span>
+                  <ChevronDown size={16} />
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

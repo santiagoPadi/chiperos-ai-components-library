@@ -22,6 +22,11 @@ const meta = {
       control: 'text',
       description: 'Label shown above the selected value',
     },
+    variant: {
+      control: 'select',
+      options: ['default', 'primary'],
+      description: 'Visual variant: default (white) or primary (green button style)',
+    },
     disabled: {
       control: 'boolean',
       description: 'Whether the select is disabled',
@@ -362,6 +367,179 @@ export const Interactive: Story = {
           <p style={{ margin: 0, fontSize: '14px' }}>
             <strong>Selected Value:</strong> {value || 'None'}
           </p>
+        </div>
+      </div>
+    );
+  },
+  args: { options: [] },
+};
+
+// ==================== PRIMARY VARIANT ====================
+
+const exportOptions: SelectOption[] = [
+  { id: 'csv', text: 'Export as CSV' },
+  { id: 'excel', text: 'Export as Excel (.xlsx)' },
+  { id: 'pdf', text: 'Export as PDF document' },
+  { id: 'json', text: 'Export as JSON data' },
+];
+
+const actionOptions: SelectOption[] = [
+  { id: 'approve', text: 'Approve selected' },
+  { id: 'reject', text: 'Reject selected' },
+  { id: 'archive', text: 'Archive selected' },
+  { id: 'delete', text: 'Delete permanently' },
+];
+
+// Wrapper for primary variant with controlled state that respects args
+const PrimarySelectWrapper = (args: any) => {
+  const [value, setValue] = useState(args.value || '');
+  
+  return (
+    <Select
+      {...args}
+      value={value}
+      onChange={(newValue) => {
+        setValue(newValue);
+        args.onChange?.(newValue);
+      }}
+    />
+  );
+};
+
+export const PrimaryVariant: Story = {
+  args: {
+    variant: 'primary',
+    options: exportOptions,
+    placeholder: 'Export',
+    label: '',
+  },
+  render: (args) => <PrimarySelectWrapper {...args} />,
+};
+
+export const PrimaryWithValue: Story = {
+  args: {
+    variant: 'primary',
+    options: exportOptions,
+    placeholder: 'Export',
+    value: 'csv',
+  },
+  render: (args) => <PrimarySelectWrapper {...args} />,
+};
+
+export const PrimaryWithLabel: Story = {
+  args: {
+    variant: 'primary',
+    options: exportOptions,
+    label: 'Format',
+    placeholder: 'Export',
+    value: 'csv',
+  },
+  render: (args) => <PrimarySelectWrapper {...args} />,
+};
+
+export const PrimaryDisabled: Story = {
+  args: {
+    variant: 'primary',
+    options: exportOptions,
+    placeholder: 'Export',
+    disabled: true,
+  },
+};
+
+export const PrimaryLongOptions: Story = {
+  render: () => {
+    const [value, setValue] = useState('');
+    
+    const longOptions: SelectOption[] = [
+      { id: '1', text: 'Download all data as comprehensive Excel report' },
+      { id: '2', text: 'Export filtered results to CSV format' },
+      { id: '3', text: 'Generate PDF summary for stakeholders' },
+      { id: '4', text: 'Send data directly to connected integrations' },
+    ];
+    
+    return (
+      <div style={{ display: 'flex', justifyContent: 'flex-end', width: '400px' }}>
+        <Select
+          variant="primary"
+          options={longOptions}
+          placeholder="Actions"
+          value={value}
+          onChange={setValue}
+        />
+      </div>
+    );
+  },
+  args: { options: [] },
+};
+
+export const VariantsComparison: Story = {
+  render: () => {
+    const [defaultValue, setDefaultValue] = useState('');
+    const [primaryValue, setPrimaryValue] = useState('');
+    
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', width: '400px' }}>
+        <div>
+          <h3 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Default Variant</h3>
+          <Select
+            variant="default"
+            options={exportOptions}
+            placeholder="Select an option"
+            value={defaultValue}
+            onChange={setDefaultValue}
+          />
+        </div>
+        
+        <div>
+          <h3 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Primary Variant (Button Style)</h3>
+          <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+            <Select
+              variant="primary"
+              options={exportOptions}
+              placeholder="Export"
+              value={primaryValue}
+              onChange={setPrimaryValue}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  },
+  args: { options: [] },
+};
+
+export const PrimaryInHeader: Story = {
+  render: () => {
+    const [exportValue, setExportValue] = useState('');
+    const [actionValue, setActionValue] = useState('');
+    
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        padding: '16px 24px',
+        backgroundColor: '#f8f8f8',
+        borderRadius: '8px',
+        width: '600px',
+      }}>
+        <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 600 }}>Users List</h2>
+        
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <Select
+            variant="primary"
+            options={actionOptions}
+            placeholder="Bulk Actions"
+            value={actionValue}
+            onChange={setActionValue}
+          />
+          <Select
+            variant="primary"
+            options={exportOptions}
+            placeholder="Export"
+            value={exportValue}
+            onChange={setExportValue}
+          />
         </div>
       </div>
     );

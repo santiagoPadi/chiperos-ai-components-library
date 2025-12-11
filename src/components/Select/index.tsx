@@ -40,6 +40,13 @@ export interface SelectProps {
   label?: string;
   
   /**
+   * Visual variant of the select
+   * - default: white background with border
+   * - primary: green background like primary button
+   */
+  variant?: 'default' | 'primary';
+  
+  /**
    * Additional CSS classes
    */
   className?: string;
@@ -54,12 +61,14 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
       options = [],
       placeholder = 'Select an option',
       label,
+      variant = 'default',
       className,
     },
     ref
   ) => {
     const selectedOption = options.find((opt) => opt.id === value);
     const displayText = selectedOption?.text || placeholder;
+    const isPrimary = variant === 'primary';
     
     const handleValueChange = (newValue: string) => {
       if (onChange) {
@@ -77,62 +86,105 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
           ref={ref}
           className={cn(
             // Layout
-            'flex items-center gap-2',
-            'w-full',
-            'px-4 py-3', // 16px horizontal, 12px vertical
+            'flex items-center justify-center gap-2',
+            'px-4 py-3',
             'rounded',
-            
-            // Border and background
-            'border border-[#ecebf0]',
-            'bg-white',
+            'font-semibold',
             
             // Typography
             'text-left',
             
             // States
-            'transition-colors',
-            'hover:border-[#a29fba]',
-            'focus:outline-none focus:ring-0 focus:border-[#a29fba]',
-            'data-[state=open]:border-[#a29fba]',
+            'transition-all',
+            'focus:outline-none focus:ring-0',
             
-            // Disabled
-            disabled && 'opacity-50 cursor-not-allowed bg-[#f4f4f4]',
+            // Default variant
+            !isPrimary && [
+              'w-full',
+              'border border-[#ecebf0]',
+              'bg-white',
+              'hover:border-[#a29fba]',
+              'focus:border-[#a29fba]',
+              'data-[state=open]:border-[#a29fba]',
+              disabled && 'opacity-50 cursor-not-allowed bg-[#f4f4f4]',
+            ],
+            
+            // Primary variant (like primary button)
+            isPrimary && [
+              'bg-[#00b56b] text-white',
+              'border border-[#00b56b]',
+              'hover:bg-[#00995a] hover:border-[#00995a]',
+              'active:bg-[#007a48] active:border-[#007a48]',
+              'data-[state=open]:bg-[#00995a] data-[state=open]:border-[#00995a]',
+              disabled && 'bg-[#e0e0e0] border-[#e0e0e0] text-[#9e9e9e] cursor-not-allowed',
+            ],
             
             className
           )}
           data-testid="select-trigger"
           aria-label={label || placeholder}
         >
-          <div className="flex flex-col flex-1 min-w-0">
-            {/* Label (shown when value is selected or in open state) */}
-            {(selectedOption || label) && (
-              <span
-                className="text-xs leading-normal text-[#575385]"
-                data-testid="select-label"
-              >
-                {label || placeholder}
-              </span>
-            )}
-            
-            {/* Selected value or placeholder */}
-            <SelectPrimitive.Value asChild>
-              <span
-                className={cn(
-                  'text-sm leading-4',
-                  selectedOption ? 'text-[#312e4d]' : 'text-[#312e4d]',
-                  !selectedOption && !label && 'text-base leading-5' // Larger when no label
-                )}
-                data-testid="select-value"
-              >
-                {displayText}
-              </span>
-            </SelectPrimitive.Value>
-          </div>
+          {/* For default variant: show label and value stacked */}
+          {!isPrimary && (
+            <div className="flex flex-col flex-1 min-w-0">
+              {/* Label (shown when value is selected or in open state) */}
+              {(selectedOption || label) && (
+                <span
+                  className="text-xs leading-normal text-[#575385]"
+                  data-testid="select-label"
+                >
+                  {label || placeholder}
+                </span>
+              )}
+              
+              {/* Selected value or placeholder */}
+              <SelectPrimitive.Value asChild>
+                <span
+                  className={cn(
+                    'text-sm leading-4',
+                    selectedOption ? 'text-[#312e4d]' : 'text-[#312e4d]',
+                    !selectedOption && !label && 'text-base leading-5'
+                  )}
+                  data-testid="select-value"
+                >
+                  {displayText}
+                </span>
+              </SelectPrimitive.Value>
+            </div>
+          )}
+          
+          {/* For primary variant: show label (if provided) and value */}
+          {isPrimary && (
+            <div className="flex flex-col min-w-0">
+              {/* Label (shown when provided) */}
+              {label && (
+                <span
+                  className="text-xs leading-normal text-white"
+                  data-testid="select-label"
+                >
+                  {label}
+                </span>
+              )}
+              
+              {/* Selected value or placeholder */}
+              <SelectPrimitive.Value asChild>
+                <span
+                  className="text-sm leading-4 whitespace-nowrap"
+                  data-testid="select-value"
+                >
+                  {displayText}
+                </span>
+              </SelectPrimitive.Value>
+            </div>
+          )}
           
           <SelectPrimitive.Icon asChild>
             <ChevronDown
               size={16}
-              className="text-[#312e4d] shrink-0"
+              className={cn(
+                'shrink-0',
+                isPrimary ? 'text-white' : 'text-[#312e4d]'
+              )}
               data-testid="select-icon"
             />
           </SelectPrimitive.Icon>
@@ -147,10 +199,15 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
               'border border-[#ecebf0]',
               'shadow-lg',
               'z-50',
-              'w-[var(--radix-select-trigger-width)]'
+              // Default: match trigger width
+              // Primary: auto width with min-width from trigger
+              isPrimary 
+                ? 'min-w-[var(--radix-select-trigger-width)]' 
+                : 'w-[var(--radix-select-trigger-width)]'
             )}
             position="popper"
             sideOffset={4}
+            align={isPrimary ? 'end' : 'start'}
             data-testid="select-content"
           >
             <SelectPrimitive.Viewport className="p-1">
@@ -170,7 +227,9 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
                     'hover:bg-[#f4f4f4]',
                     'focus:bg-[#f4f4f4]',
                     'data-[state=checked]:bg-[#ecebf0]',
-                    'data-[disabled]:opacity-50 data-[disabled]:pointer-events-none'
+                    'data-[disabled]:opacity-50 data-[disabled]:pointer-events-none',
+                    // For primary variant, prevent text truncation
+                    isPrimary && 'whitespace-nowrap'
                   )}
                   data-testid={`select-option-${option.id}`}
                 >
