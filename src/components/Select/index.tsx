@@ -130,7 +130,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
               {/* Label (shown when value is selected or in open state) */}
               {(selectedOption || label) && (
                 <span
-                  className="text-xs leading-normal text-[#575385]"
+                  className="text-xs leading-normal font-medium text-[#575385]"
                   data-testid="select-label"
                 >
                   {label || placeholder}
