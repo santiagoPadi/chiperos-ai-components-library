@@ -122,12 +122,12 @@ export function Table<T = any>({
     // If value is an object with primary and secondary text
     if (typeof value === 'object' && 'primary' in value) {
       return (
-        <div className="flex flex-col">
-          <span className="text-sm leading-[18px] text-[#312e4d]">
+        <div className="flex flex-col min-w-0">
+          <span className="text-sm leading-[18px] text-[#312e4d] truncate">
             {value.primary}
           </span>
           {value.secondary && (
-            <span className="text-xs leading-normal text-[#575385]">
+            <span className="text-xs leading-normal text-[#575385] truncate">
               {value.secondary}
             </span>
           )}
@@ -136,7 +136,7 @@ export function Table<T = any>({
     }
     
     return (
-      <span className="text-sm leading-[18px] text-[#312e4d]">
+      <span className="text-sm leading-[18px] text-[#312e4d] truncate block">
         {String(value)}
       </span>
     );
@@ -215,7 +215,7 @@ export function Table<T = any>({
                 <div
                   key={column.key}
                   className={cn(
-                    'flex-1 min-w-0',
+                    'flex-1 min-w-0 overflow-hidden',
                     column.className
                   )}
                   data-testid={`table-cell-${rowIndex}-${column.key}`}

@@ -319,7 +319,6 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                     value={filter.value}
                     onChange={(value) => filter.onChange?.(value)}
                     placeholder={filter.placeholder || filter.label}
-                    label={filter.label}
                     className="h-11"
                   />
                 ) : (

@@ -403,3 +403,51 @@ export const SortableExample: Story = {
   args: { columns: [], data: [] },
 };
 
+interface LongTextItem {
+  id: number;
+  description: string;
+  url: string;
+  notes: string;
+}
+
+export const LongTextTruncation: StoryObj<TableProps<LongTextItem>> = {
+  render: () => {
+    const columns: TableColumn<LongTextItem>[] = [
+      { key: 'id', label: 'ID' },
+      { key: 'description', label: 'Description' },
+      { key: 'url', label: 'URL' },
+      { key: 'notes', label: 'Notes' },
+    ];
+    
+    const data: LongTextItem[] = [
+      {
+        id: 1,
+        description: 'This is a very long description that should be truncated with ellipsis when it does not fit in the column width',
+        url: 'https://www.example.com/very/long/path/to/resource/that/should/also/be/truncated',
+        notes: 'These are some notes that might also be very long and need truncation',
+      },
+      {
+        id: 2,
+        description: 'Short text',
+        url: 'https://example.com',
+        notes: 'Brief note',
+      },
+      {
+        id: 3,
+        description: 'Another extremely long description that demonstrates how the text truncation works when the content exceeds the available column width in the table',
+        url: 'https://www.verylongdomainname.com/with/many/subdirectories/and/a/very/long/path',
+        notes: 'This is a very long note that contains multiple sentences and should be properly truncated to maintain the table layout',
+      },
+    ];
+    
+    return (
+      <Table
+        columns={columns}
+        data={data}
+        showPagination={false}
+      />
+    );
+  },
+  args: { columns: [], data: [] },
+};
+
