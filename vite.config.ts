@@ -6,9 +6,47 @@ import { fileURLToPath } from 'url';
 import { UserConfig } from 'vitest/config';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import tailwindcss from '@tailwindcss/vite';
+import { copyFileSync, mkdirSync, existsSync, readdirSync, statSync } from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Plugin to copy fonts to dist
+function copyFonts() {
+  return {
+    name: 'copy-fonts',
+    writeBundle() {
+      const fontsSource = path.resolve(__dirname, 'fonts');
+      const fontsDest = path.resolve(__dirname, 'dist/fonts');
+      
+      if (existsSync(fontsSource)) {
+        // Create dist/fonts directory if it doesn't exist
+        if (!existsSync(fontsDest)) {
+          mkdirSync(fontsDest, { recursive: true });
+        }
+        
+        // Copy CaustenRound directory
+        const caustenDir = path.join(fontsSource, 'CaustenRound');
+        const caustenDest = path.join(fontsDest, 'CaustenRound');
+        
+        if (existsSync(caustenDir)) {
+          if (!existsSync(caustenDest)) {
+            mkdirSync(caustenDest, { recursive: true });
+          }
+          
+          const files = readdirSync(caustenDir);
+          files.forEach(file => {
+            const srcFile = path.join(caustenDir, file);
+            const destFile = path.join(caustenDest, file);
+            if (statSync(srcFile).isFile()) {
+              copyFileSync(srcFile, destFile);
+            }
+          });
+        }
+      }
+    },
+  };
+}
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -19,6 +57,7 @@ export default defineConfig({
     dts({
       insertTypesEntry: true,
     }),
+    copyFonts(),
   ],
   build: {
     sourcemap: true,

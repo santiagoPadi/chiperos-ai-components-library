@@ -127,13 +127,13 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
           {/* For default variant: show label and value stacked */}
           {!isPrimary && (
             <div className="flex flex-col flex-1 min-w-0">
-              {/* Label (shown when value is selected or in open state) */}
-              {(selectedOption || label) && (
+              {/* Label (shown only when no value is selected) */}
+              {label && !selectedOption && (
                 <span
                   className="text-xs leading-normal font-medium text-[#575385]"
                   data-testid="select-label"
                 >
-                  {label || placeholder}
+                  {label}
                 </span>
               )}
               
@@ -141,7 +141,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
               <SelectPrimitive.Value asChild>
                 <span
                   className={cn(
-                    'text-sm leading-4',
+                    'text-sm leading-4 font-normal',
                     selectedOption ? 'text-[#312e4d]' : 'text-[#312e4d]',
                     !selectedOption && !label && 'text-base leading-5'
                   )}
@@ -156,8 +156,8 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
           {/* For primary variant: show label (if provided) and value */}
           {isPrimary && (
             <div className="flex flex-col min-w-0">
-              {/* Label (shown when provided) */}
-              {label && (
+              {/* Label (shown only when no value is selected) */}
+              {label && !selectedOption && (
                 <span
                   className="text-xs leading-normal text-white"
                   data-testid="select-label"
