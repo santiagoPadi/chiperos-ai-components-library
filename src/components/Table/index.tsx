@@ -159,7 +159,8 @@ export function Table<T = any>({
       data-testid="table-container"
     >
       {/* Table Body */}
-      <div className="w-full" data-testid="table-body">
+      <div className="w-full overflow-x-auto" data-testid="table-body">
+        <div className="min-w-[800px]">
         {/* Header Row */}
         <div
           className={cn(
@@ -226,6 +227,7 @@ export function Table<T = any>({
             </div>
           ))
         )}
+        </div>
       </div>
       
       {/* Pagination */}
