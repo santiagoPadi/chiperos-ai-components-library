@@ -19,3 +19,6 @@ export * from './Switcher';
 export * from './Table';
 export * from './TableHeader';
 export * from './Toasts';
+export * from './FilterContainer';
+export * from './ComposedChart';
+export * from './ProgressBarInfo';
