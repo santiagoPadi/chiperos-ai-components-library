@@ -2,7 +2,7 @@ import React from 'react';
 import { cn } from '../../lib/utils';
 import { Select, SelectOption } from '../Select';
 import { Button } from '../ButtonRadix';
-import { Download, ListRestart, RotateCcw } from 'lucide-react';
+import { Download, ListRestart } from 'lucide-react';
 
 export interface FilterContainerFilter {
     /**
