@@ -13,39 +13,39 @@ export interface SelectProps {
    * The currently selected value (id)
    */
   value?: string;
-  
+
   /**
    * Callback fired when selection changes
    */
   onChange?: (text: string) => void;
-  
+
   /**
    * Whether the select is disabled
    */
   disabled?: boolean;
-  
+
   /**
    * Array of options to display
    */
   options: SelectOption[];
-  
+
   /**
    * Placeholder text when no option is selected
    */
   placeholder?: string;
-  
+
   /**
    * Label text shown above the selected value
    */
   label?: string;
-  
+
   /**
    * Visual variant of the select
    * - default: white background with border
    * - primary: green background like primary button
    */
   variant?: 'default' | 'primary';
-  
+
   /**
    * Additional CSS classes
    */
@@ -69,13 +69,13 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
     const selectedOption = options.find((opt) => opt.id === value);
     const displayText = selectedOption?.text || placeholder;
     const isPrimary = variant === 'primary';
-    
+
     const handleValueChange = (newValue: string) => {
       if (onChange) {
         onChange(newValue);
       }
     };
-    
+
     return (
       <SelectPrimitive.Root
         value={value}
@@ -90,14 +90,14 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
             'px-4 py-3',
             'rounded',
             'font-semibold',
-            
+
             // Typography
             'text-left',
-            
+
             // States
             'transition-all',
             'focus:outline-none focus:ring-0',
-            
+
             // Default variant
             !isPrimary && [
               'w-full',
@@ -108,7 +108,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
               'data-[state=open]:border-[#a29fba]',
               disabled && 'opacity-50 cursor-not-allowed bg-[#f4f4f4]',
             ],
-            
+
             // Primary variant (like primary button)
             isPrimary && [
               'bg-[#00b56b] text-white',
@@ -118,7 +118,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
               'data-[state=open]:bg-[#00995a] data-[state=open]:border-[#00995a]',
               disabled && 'bg-[#e0e0e0] border-[#e0e0e0] text-[#9e9e9e] cursor-not-allowed',
             ],
-            
+
             className
           )}
           data-testid="select-trigger"
@@ -136,23 +136,23 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
                   {label}
                 </span>
               )}
-              
+
               {/* Selected value or placeholder */}
-              <SelectPrimitive.Value asChild>
-                <span
-                  className={cn(
-                    'text-sm leading-4 font-normal',
-                    selectedOption ? 'text-[#312e4d]' : 'text-[#312e4d]',
-                    !selectedOption && !label && 'text-base leading-5'
-                  )}
-                  data-testid="select-value"
-                >
+              <span
+                className={cn(
+                  'text-sm leading-4 font-normal',
+                  selectedOption ? 'text-[#312e4d]' : 'text-[#312e4d]',
+                  !selectedOption && !label && 'text-base leading-5'
+                )}
+                data-testid="select-value"
+              >
+                <SelectPrimitive.Value placeholder={placeholder}>
                   {displayText}
-                </span>
-              </SelectPrimitive.Value>
+                </SelectPrimitive.Value>
+              </span>
             </div>
           )}
-          
+
           {/* For primary variant: show label (if provided) and value */}
           {isPrimary && (
             <div className="flex flex-col min-w-0">
@@ -165,19 +165,19 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
                   {label}
                 </span>
               )}
-              
+
               {/* Selected value or placeholder */}
-              <SelectPrimitive.Value asChild>
-                <span
-                  className="text-sm leading-4 whitespace-nowrap"
-                  data-testid="select-value"
-                >
+              <span
+                className="text-sm leading-4 whitespace-nowrap"
+                data-testid="select-value"
+              >
+                <SelectPrimitive.Value placeholder={placeholder}>
                   {displayText}
-                </span>
-              </SelectPrimitive.Value>
+                </SelectPrimitive.Value>
+              </span>
             </div>
           )}
-          
+
           <SelectPrimitive.Icon asChild>
             <ChevronDown
               size={16}
@@ -189,7 +189,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
             />
           </SelectPrimitive.Icon>
         </SelectPrimitive.Trigger>
-        
+
         <SelectPrimitive.Portal>
           <SelectPrimitive.Content
             className={cn(
@@ -201,8 +201,8 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
               'z-50',
               // Default: match trigger width
               // Primary: auto width with min-width from trigger
-              isPrimary 
-                ? 'min-w-[var(--radix-select-trigger-width)]' 
+              isPrimary
+                ? 'min-w-[var(--radix-select-trigger-width)]'
                 : 'w-[var(--radix-select-trigger-width)]'
             )}
             position="popper"
