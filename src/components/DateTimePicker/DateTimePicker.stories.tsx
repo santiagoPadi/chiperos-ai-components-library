@@ -28,6 +28,10 @@ const meta = {
       control: 'boolean',
       description: 'Whether to show the input field',
     },
+    showLabel: {
+      control: 'boolean',
+      description: 'Whether to show the label',
+    },
     showActions: {
       control: 'boolean',
       description: 'Whether to show action buttons (Cancel/Save)',
@@ -239,6 +243,16 @@ export const WithoutInput: Story = {
   render: (args) => <DateTimePickerWrapper {...args} />,
 };
 
+export const WithoutLabel: Story = {
+  args: {
+    mode: 'single',
+    label: 'Hidden Label',
+    showLabel: false,
+    placeholder: 'Select a date',
+  },
+  render: (args) => <DateTimePickerWrapper {...args} />,
+};
+
 export const CustomFormat: Story = {
   args: {
     mode: 'single',
@@ -309,6 +323,15 @@ export const AllStates: Story = {
         <DateTimePicker
           label="Select Date"
           disabled
+        />
+      </div>
+
+      <div>
+        <h3 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Without Label</h3>
+        <DateTimePicker
+          label="Hidden Label"
+          showLabel={false}
+          placeholder="Select a date"
         />
       </div>
     </div>

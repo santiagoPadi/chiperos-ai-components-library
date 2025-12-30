@@ -116,6 +116,12 @@ export interface DateTimePickerProps {
   label?: string;
 
   /**
+   * Whether to show the label
+   * @default true
+   */
+  showLabel?: boolean;
+
+  /**
    * Whether the label is required (shows asterisk)
    * @default false
    */
@@ -391,6 +397,7 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
       onTimePresetChange: _onTimePresetChange, // Deprecated, kept for backward compatibility
       showInput = true,
       label,
+      showLabel = true,
       required = false,
       placeholder = 'Select',
       formatValue,
@@ -793,7 +800,7 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
         {/* Input Field */}
         {showInput && (
           <div className="flex flex-col gap-1 isolate items-start justify-center w-full">
-            {label && (
+            {showLabel && label && (
               <div className="flex gap-0.5 isolate items-center leading-0 p-0 text-xs font-medium text-[#575385] whitespace-nowrap z-[3]">
                 <div className="capitalize flex flex-col justify-center z-[3]">
                   <p className="leading-normal">{label}</p>
