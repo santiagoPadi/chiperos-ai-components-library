@@ -616,7 +616,7 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
                       onClick={() => !isDisabled && handleDateClick(date)}
                       disabled={isDisabled || disabled}
                       className={cn(
-                        'flex flex-1 gap-2 h-8 items-center justify-center min-h-0 min-w-0 p-2 relative shrink-0',
+                        'flex flex-1 gap-2 bg-white h-8 items-center justify-center min-h-0 min-w-0 p-2 relative shrink-0',
                         'transition-colors',
                         !isDisabled && !disabled && 'hover:bg-[#f4f4f4] cursor-pointer',
                         isDisabled && 'opacity-50 cursor-not-allowed',
