@@ -1,7 +1,7 @@
 {
   "name": "chiperos-ai-components-library",
   "private": false,
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "Chiperos AI Components Library - A modern React component library built with Vite, TypeScript and Tailwind CSS.",
   "type": "module",
   "main": "./dist/chiperos-ai-components-library.cjs",
