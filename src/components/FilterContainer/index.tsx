@@ -84,6 +84,12 @@ export interface DateRangeFilter extends BaseFilter {
     showTimePresets?: boolean;
 
     /**
+     * Whether to show the label
+     * @default true
+     */
+    showLabel?: boolean;
+
+    /**
      * Minimum selectable date
      */
     minDate?: Date;
@@ -193,6 +199,7 @@ export const FilterContainer: React.FC<FilterContainerProps> = ({
                                         }
                                     }}
                                     label={filter.label}
+                                    showLabel={filter.showLabel}
                                     placeholder={filter.placeholder || filter.label}
                                     showTimePresets={filter.showTimePresets ?? true}
                                     minDate={filter.minDate}
