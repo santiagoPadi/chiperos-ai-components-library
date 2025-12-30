@@ -3,8 +3,12 @@ import { cn } from '../../lib/utils';
 import { Select, SelectOption } from '../Select';
 import { Button } from '../ButtonRadix';
 import { Download, ListRestart } from 'lucide-react';
+import { DateTimePicker } from '../DateTimePicker';
 
-export interface FilterContainerFilter {
+/**
+ * Base filter properties shared by all filter types
+ */
+interface BaseFilter {
     /**
      * Unique key for the filter
      */
@@ -19,6 +23,16 @@ export interface FilterContainerFilter {
      * Placeholder text shown when no option is selected
      */
     placeholder?: string;
+}
+
+/**
+ * Select filter type
+ */
+export interface SelectFilter extends BaseFilter {
+    /**
+     * Filter type
+     */
+    type?: 'select';
 
     /**
      * Options for dropdown filter
@@ -35,6 +49,55 @@ export interface FilterContainerFilter {
      */
     onChange?: (value: string) => void;
 }
+
+/**
+ * Date range for dateRange filter
+ */
+export interface DateRangeValue {
+    start: Date;
+    end: Date;
+}
+
+/**
+ * Date range filter type
+ */
+export interface DateRangeFilter extends BaseFilter {
+    /**
+     * Filter type
+     */
+    type: 'dateRange';
+
+    /**
+     * Selected date range value
+     */
+    value?: DateRangeValue | null;
+
+    /**
+     * Callback when date range changes
+     */
+    onChange?: (value: DateRangeValue | null) => void;
+
+    /**
+     * Whether to show time presets (Today, Tomorrow, etc.)
+     * @default true
+     */
+    showTimePresets?: boolean;
+
+    /**
+     * Minimum selectable date
+     */
+    minDate?: Date;
+
+    /**
+     * Maximum selectable date
+     */
+    maxDate?: Date;
+}
+
+/**
+ * Union type for all filter types
+ */
+export type FilterContainerFilter = SelectFilter | DateRangeFilter;
 
 export interface FilterContainerProps {
     /**
@@ -98,7 +161,7 @@ export const FilterContainer: React.FC<FilterContainerProps> = ({
     return (
         <div
             className={cn(
-                'bg-white rounded-xl p-6',
+                'bg-white rounded-xl p-6 px-14',
                 'flex items-start gap-4',
                 className
             )}
@@ -109,22 +172,54 @@ export const FilterContainer: React.FC<FilterContainerProps> = ({
                 className="flex flex-wrap items-center gap-4 w-[70%]"
                 data-testid="filter-container-filters"
             >
-                {filters.map((filter) => (
-                    <div
-                        key={filter.key}
-                        className="min-w-[160px] flex-shrink-0"
-                        data-testid={`filter-container-filter-${filter.key}`}
-                    >
-                        <Select
-                            options={filter.options}
-                            value={filter.value}
-                            onChange={(value) => filter.onChange?.(value)}
-                            placeholder={filter.placeholder || filter.label}
-                            label={filter.label}
-                            className="h-11"
-                        />
-                    </div>
-                ))}
+                {filters.map((filter) => {
+                    // DateRange filter
+                    if (filter.type === 'dateRange') {
+                        return (
+                            <div
+                                key={filter.key}
+                                className="min-w-[200px] flex-shrink-0"
+                                data-testid={`filter-container-filter-${filter.key}`}
+                            >
+                                <DateTimePicker
+                                    mode="range"
+                                    calendarView="multi"
+                                    value={filter.value}
+                                    onChange={(dates) => {
+                                        if (dates && typeof dates === 'object' && 'start' in dates) {
+                                            filter.onChange?.(dates as DateRangeValue);
+                                        } else {
+                                            filter.onChange?.(null);
+                                        }
+                                    }}
+                                    label={filter.label}
+                                    placeholder={filter.placeholder || filter.label}
+                                    showTimePresets={filter.showTimePresets ?? true}
+                                    minDate={filter.minDate}
+                                    maxDate={filter.maxDate}
+                                />
+                            </div>
+                        );
+                    }
+
+                    // Default: Select filter
+                    return (
+                        <div
+                            key={filter.key}
+                            className="min-w-[160px] flex-shrink-0"
+                            data-testid={`filter-container-filter-${filter.key}`}
+                        >
+                            <Select
+                                options={filter.options}
+                                value={filter.value}
+                                onChange={(value) => filter.onChange?.(value)}
+                                placeholder={filter.placeholder || filter.label}
+                                label={filter.label}
+                                className="h-11"
+                            />
+                        </div>
+                    );
+                })}
             </div>
 
             {/* Action Buttons Container - 30% always on the right */}

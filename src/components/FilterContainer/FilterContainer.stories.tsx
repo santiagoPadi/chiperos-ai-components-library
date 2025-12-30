@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
-import { FilterContainer, FilterContainerFilter } from './index';
+import { FilterContainer, FilterContainerFilter, DateRangeValue } from './index';
 
 const meta: Meta<typeof FilterContainer> = {
     title: 'Components/FilterContainer',
@@ -242,6 +242,237 @@ export const Controlled: Story = {
                 <div className="bg-gray-100 p-4 rounded-lg">
                     <h4 className="font-semibold mb-2">Current Filter Values:</h4>
                     <pre className="text-sm">{JSON.stringify(filterValues, null, 2)}</pre>
+                </div>
+            </div>
+        );
+    },
+};
+
+/**
+ * With Date Range Picker - demonstrates using a DateTimePicker as a filter
+ */
+export const WithDateRangePicker: Story = {
+    render: function WithDateRangeFilterContainer() {
+        const [filterValues, setFilterValues] = useState<Record<string, string>>({
+            country: '',
+            category: '',
+            status: '',
+        });
+        const [dateRange, setDateRange] = useState<DateRangeValue | null>(null);
+
+        const handleFilterChange = (key: string) => (value: string) => {
+            setFilterValues((prev) => ({
+                ...prev,
+                [key]: value,
+            }));
+        };
+
+        const handleApply = () => {
+            const allFilters = {
+                ...filterValues,
+                dateRange: dateRange
+                    ? {
+                          start: dateRange.start.toISOString(),
+                          end: dateRange.end.toISOString(),
+                      }
+                    : null,
+            };
+            console.log('Applied filters:', allFilters);
+            alert(`Applied filters:\n${JSON.stringify(allFilters, null, 2)}`);
+        };
+
+        const handleRestart = () => {
+            setFilterValues({
+                country: '',
+                category: '',
+                status: '',
+            });
+            setDateRange(null);
+            alert('Filters reset!');
+        };
+
+        const filters: FilterContainerFilter[] = [
+            {
+                key: 'country',
+                label: 'Country',
+                placeholder: 'Select country',
+                options: countryOptions,
+                value: filterValues.country,
+                onChange: handleFilterChange('country'),
+            },
+            {
+                key: 'category',
+                label: 'Category',
+                placeholder: 'Select category',
+                options: categoryOptions,
+                value: filterValues.category,
+                onChange: handleFilterChange('category'),
+            },
+            {
+                key: 'status',
+                label: 'Status',
+                placeholder: 'Select status',
+                options: statusOptions,
+                value: filterValues.status,
+                onChange: handleFilterChange('status'),
+            },
+            {
+                key: 'dateRange',
+                type: 'dateRange',
+                label: 'Date Range',
+                placeholder: 'Select date range',
+                value: dateRange,
+                onChange: setDateRange,
+                showTimePresets: true,
+            },
+        ];
+
+        return (
+            <div className="space-y-4">
+                <FilterContainer
+                    filters={filters}
+                    onApply={handleApply}
+                    onDownload={() => alert('Download clicked')}
+                    onRestart={handleRestart}
+                    applyLabel="Apply Filters"
+                />
+                <div className="bg-gray-100 p-4 rounded-lg">
+                    <h4 className="font-semibold mb-2">Current Filter Values:</h4>
+                    <pre className="text-sm">
+                        {JSON.stringify(
+                            {
+                                ...filterValues,
+                                dateRange: dateRange
+                                    ? {
+                                          start: dateRange.start.toLocaleDateString(),
+                                          end: dateRange.end.toLocaleDateString(),
+                                      }
+                                    : null,
+                            },
+                            null,
+                            2
+                        )}
+                    </pre>
+                </div>
+            </div>
+        );
+    },
+};
+
+/**
+ * Multiple filters with Date Range - comprehensive example with many filter types
+ */
+export const ComprehensiveFilters: Story = {
+    render: function ComprehensiveFiltersContainer() {
+        const [filterValues, setFilterValues] = useState<Record<string, string>>({
+            country: '',
+            category: '',
+            status: '',
+            supplier: '',
+        });
+        const [dateRange, setDateRange] = useState<DateRangeValue | null>(null);
+
+        const handleFilterChange = (key: string) => (value: string) => {
+            setFilterValues((prev) => ({
+                ...prev,
+                [key]: value,
+            }));
+        };
+
+        const handleApply = () => {
+            const allFilters = {
+                ...filterValues,
+                dateRange: dateRange
+                    ? {
+                          start: dateRange.start.toISOString(),
+                          end: dateRange.end.toISOString(),
+                      }
+                    : null,
+            };
+            console.log('Applied filters:', allFilters);
+            alert(`Applied filters:\n${JSON.stringify(allFilters, null, 2)}`);
+        };
+
+        const handleRestart = () => {
+            setFilterValues({
+                country: '',
+                category: '',
+                status: '',
+                supplier: '',
+            });
+            setDateRange(null);
+        };
+
+        const filters: FilterContainerFilter[] = [
+            {
+                key: 'country',
+                label: 'Country',
+                placeholder: 'Select country',
+                options: countryOptions,
+                value: filterValues.country,
+                onChange: handleFilterChange('country'),
+            },
+            {
+                key: 'category',
+                label: 'Category',
+                placeholder: 'Select category',
+                options: categoryOptions,
+                value: filterValues.category,
+                onChange: handleFilterChange('category'),
+            },
+            {
+                key: 'status',
+                label: 'Status',
+                placeholder: 'Select status',
+                options: statusOptions,
+                value: filterValues.status,
+                onChange: handleFilterChange('status'),
+            },
+            {
+                key: 'supplier',
+                label: 'Supplier',
+                placeholder: 'Select supplier',
+                options: supplierOptions,
+                value: filterValues.supplier,
+                onChange: handleFilterChange('supplier'),
+            },
+            {
+                key: 'dateRange',
+                type: 'dateRange',
+                label: 'Date Range',
+                placeholder: 'Select dates',
+                value: dateRange,
+                onChange: setDateRange,
+                showTimePresets: true,
+            },
+        ];
+
+        return (
+            <div className="space-y-4">
+                <FilterContainer
+                    filters={filters}
+                    onApply={handleApply}
+                    onDownload={() => alert('Download clicked')}
+                    onRestart={handleRestart}
+                    applyLabel="Apply Filters"
+                />
+                <div className="bg-gray-100 p-4 rounded-lg">
+                    <h4 className="font-semibold mb-2">Current Filter Values:</h4>
+                    <pre className="text-sm">
+                        {JSON.stringify(
+                            {
+                                ...filterValues,
+                                dateRange: dateRange
+                                    ? {
+                                          start: dateRange.start.toLocaleDateString(),
+                                          end: dateRange.end.toLocaleDateString(),
+                                      }
+                                    : null,
+                            },
+                            null,
+                            2
+                        )}
+                    </pre>
                 </div>
             </div>
         );
