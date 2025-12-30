@@ -44,11 +44,11 @@ export interface TimePreset {
 /**
  * Selected date(s) - can be single date, date range, or multiple dates
  */
-export type SelectedDates = 
-  | Date 
-  | { start: Date; end: Date } 
-  | Date[] 
-  | null 
+export type SelectedDates =
+  | Date
+  | { start: Date; end: Date }
+  | Date[]
+  | null
   | undefined;
 
 /**
@@ -62,172 +62,172 @@ export interface DateTimePickerProps {
    * - For 'multi' mode: Date[] | null
    */
   value?: SelectedDates;
-  
+
   /**
    * Callback fired when date selection changes
    */
   onChange?: (dates: SelectedDates) => void;
-  
+
   /**
    * Selection mode: single date, date range, or multiple dates
    * @default 'single'
    */
   mode?: DateTimePickerMode;
-  
+
   /**
    * Calendar view type: single or multi calendar
    * @default 'single'
    */
   calendarView?: CalendarViewType;
-  
+
   /**
    * Whether to show time presets
    * @default false
    */
   showTimePresets?: boolean;
-  
+
   /**
    * Time preset options
    * @deprecated Time presets are now fixed. This prop is kept for backward compatibility but has no effect.
    */
   timePresets?: TimePreset[];
-  
+
   /**
    * Selected time preset value
    * @deprecated This prop is kept for backward compatibility but has no effect.
    */
   selectedTimePreset?: string;
-  
+
   /**
    * Callback fired when time preset is selected
    * @deprecated This prop is kept for backward compatibility but has no effect.
    */
   onTimePresetChange?: (preset: string) => void;
-  
+
   /**
    * Whether to show the input field
    * @default true
    */
   showInput?: boolean;
-  
+
   /**
    * Input label
    */
   label?: string;
-  
+
   /**
    * Whether the label is required (shows asterisk)
    * @default false
    */
   required?: boolean;
-  
+
   /**
    * Input placeholder
    * @default 'Select'
    */
   placeholder?: string;
-  
+
   /**
    * Format function for displaying selected date(s) in input
    */
   formatValue?: (dates: SelectedDates) => string;
-  
+
   /**
    * List of holidays to highlight
    */
   holidays?: Holiday[];
-  
+
   /**
    * List of event days (shows indicator dot)
    */
   eventDays?: EventDay[];
-  
+
   /**
    * Minimum selectable date
    */
   minDate?: Date;
-  
+
   /**
    * Maximum selectable date
    */
   maxDate?: Date;
-  
+
   /**
    * Initial month to display (defaults to current month)
    */
   initialMonth?: Date;
-  
+
   /**
    * Whether to show action buttons (Cancel/Save)
    * @default true
    * @deprecated Action buttons are now always visible. This prop is kept for backward compatibility but has no effect.
    */
   showActions?: boolean;
-  
+
   /**
    * Cancel button label
    * @default 'Cancel'
    */
   cancelLabel?: string;
-  
+
   /**
    * Save button label
    * @default 'Save'
    */
   saveLabel?: string;
-  
+
   /**
    * Callback fired when cancel is clicked
    */
   onCancel?: () => void;
-  
+
   /**
    * Callback fired when save is clicked
    */
   onSave?: (dates: SelectedDates) => void;
-  
+
   /**
    * Whether the picker is disabled
    * @default false
    */
   disabled?: boolean;
-  
+
   /**
    * Error message or state
    */
   error?: string | boolean;
-  
+
   /**
    * Additional CSS classes
    */
   className?: string;
-  
+
   /**
    * Whether the calendar is open
    */
   open?: boolean;
-  
+
   /**
    * Callback fired when open state changes
    */
   onOpenChange?: (open: boolean) => void;
-  
+
   /**
    * Custom locale for date formatting (defaults to browser locale)
    */
   locale?: string;
-  
+
   /**
    * First day of week (0 = Sunday, 1 = Monday, etc.)
    * @default 0
    */
   firstDayOfWeek?: number;
-  
+
   /**
    * Custom weekday labels
    */
   weekdayLabels?: string[];
-  
+
   /**
    * Custom month names
    */
@@ -350,25 +350,25 @@ const formatDates = (
   if (customFormat) {
     return customFormat(dates);
   }
-  
+
   if (!dates) {
     return '';
   }
-  
+
   if (mode === 'single' && dates instanceof Date) {
     return formatDate(dates, locale);
   }
-  
+
   if (mode === 'range' && typeof dates === 'object' && 'start' in dates) {
     return formatDateRange(dates.start, dates.end, locale);
   }
-  
+
   if (mode === 'multi' && Array.isArray(dates)) {
     if (dates.length === 0) return '';
     if (dates.length === 1) return formatDate(dates[0], locale);
     return `${dates.length} dates selected`;
   }
-  
+
   return '';
 };
 
@@ -430,9 +430,9 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
     const [tempValue, setTempValue] = useState<SelectedDates>(value);
     // Track which preset is currently selected
     const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
-    
+
     const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
-    
+
     // Reset tempValue and selectedPreset when popup opens or value changes externally
     useEffect(() => {
       if (isOpen) {
@@ -440,7 +440,7 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
         setSelectedPreset(null);
       }
     }, [isOpen, value]);
-    
+
     const handleOpenChange = useCallback((newOpen: boolean) => {
       if (onOpenChange) {
         onOpenChange(newOpen);
@@ -453,7 +453,7 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
         setSelectedPreset(null);
       }
     }, [onOpenChange, value]);
-    
+
     const handleDateClick = useCallback((date: Date) => {
       if (disabled) return;
 
@@ -478,7 +478,7 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
       } else if (mode === 'multi') {
         const currentDates = Array.isArray(tempValue) ? tempValue : [];
         const dateIndex = currentDates.findIndex(d => isSameDay(d, date));
-        
+
         if (dateIndex >= 0) {
           // Remove date if already selected
           const newDates = currentDates.filter((_, i) => i !== dateIndex);
@@ -489,26 +489,26 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
         }
       }
     }, [mode, tempValue, disabled]);
-    
+
     const handleSave = useCallback(() => {
       onChange?.(tempValue);
       onSave?.(tempValue);
       handleOpenChange(false);
     }, [tempValue, onChange, onSave, handleOpenChange]);
-    
+
     const handleCancel = useCallback(() => {
       setTempValue(value);
       onCancel?.();
       handleOpenChange(false);
     }, [value, onCancel, handleOpenChange]);
-    
+
     const handlePrevMonth = useCallback(() => {
       setCurrentMonth(prev => {
         const newMonth = new Date(prev);
         newMonth.setMonth(newMonth.getMonth() - 1);
         return newMonth;
       });
-      
+
       if (calendarView === 'multi') {
         setSecondMonth(prev => {
           const newMonth = new Date(prev);
@@ -517,14 +517,14 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
         });
       }
     }, [calendarView]);
-    
+
     const handleNextMonth = useCallback(() => {
       setCurrentMonth(prev => {
         const newMonth = new Date(prev);
         newMonth.setMonth(newMonth.getMonth() + 1);
         return newMonth;
       });
-      
+
       if (calendarView === 'multi') {
         setSecondMonth(prev => {
           const newMonth = new Date(prev);
@@ -533,28 +533,28 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
         });
       }
     }, [calendarView]);
-    
+
     const isDateDisabled = useCallback((date: Date): boolean => {
       if (minDate && date < minDate) return true;
       if (maxDate && date > maxDate) return true;
       return false;
     }, [minDate, maxDate]);
-    
+
     const renderCalendar = useCallback((month: Date) => {
       const daysInMonth = getDaysInMonth(month);
       const firstDay = getFirstDayOfMonth(month, firstDayOfWeek);
       const days: (Date | null)[] = [];
-      
+
       // Add empty cells for days before the first day of the month
       for (let i = 0; i < firstDay; i++) {
         days.push(null);
       }
-      
+
       // Add all days of the month
       for (let day = 1; day <= daysInMonth; day++) {
         days.push(new Date(month.getFullYear(), month.getMonth(), day));
       }
-      
+
       // Group days into weeks and ensure each week has exactly 7 days
       const weeks: (Date | null)[][] = [];
       for (let i = 0; i < days.length; i += 7) {
@@ -565,7 +565,7 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
         }
         weeks.push(week);
       }
-      
+
       return (
         <div className="flex flex-col gap-1 w-full">
           {/* Weekday headers */}
@@ -581,7 +581,6 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
                   <p
                     className={cn(
                       'text-xs text-center w-7 whitespace-pre-wrap',
-                      'font-[family-name:var(--typography/font/family/body,\'Causten_Round:Regular\',sans-serif)]',
                       isHolidayDay ? 'text-[#d4002c]' : 'text-[#312e4d]'
                     )}
                   >
@@ -591,7 +590,7 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
               );
             })}
           </div>
-          
+
           {/* Calendar days */}
           <div className="flex flex-col gap-1 w-full">
             {weeks.map((week, weekIndex) => (
@@ -605,11 +604,11 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
                       />
                     );
                   }
-                  
+
                   const dateState = getDateState(date, tempValue, mode, holidays);
                   const hasEventDay = hasEvent(date, eventDays);
                   const isDisabled = isDateDisabled(date);
-                  
+
                   return (
                     <button
                       key={date.toISOString()}
@@ -629,14 +628,14 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
                       )}
                     >
                       {dateState === 'selected' && (
-                        <p className="text-xs text-center text-white font-[family-name:var(--typography/font/family/body,\'Causten_Round:Regular\',sans-serif)]">
+                        <p className="text-xs text-center text-white">
                           {date.getDate()}
                         </p>
                       )}
                       {dateState !== 'selected' && (
                         <p
                           className={cn(
-                            'text-xs text-center font-[family-name:var(--typography/font/family/body,\'Causten_Round:Regular\',sans-serif)]',
+                            'text-xs text-center',
                             dateState === 'holiday' && 'text-[#d4002c]',
                             dateState === 'today' && 'text-[#00995a] font-semibold',
                             dateState === 'regular' && 'text-[#312e4d]',
@@ -648,7 +647,7 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
                           {date.getDate()}
                         </p>
                       )}
-                      
+
                       {/* Event day indicator */}
                       {hasEventDay && (dateState === 'regular' || dateState === 'holiday' || dateState === 'today') && (
                         <div className="absolute right-1 top-1 size-1">
@@ -679,11 +678,11 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
       disabled,
       handleDateClick,
     ]);
-    
+
     const displayValue = useMemo(() => {
       return formatDates(value, mode, locale, formatValue);
     }, [value, mode, locale, formatValue]);
-    
+
     // Fixed time presets
     const fixedTimePresets = useMemo(() => {
       return [
@@ -693,7 +692,7 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
         { label: 'This Month', value: 'this-month' },
       ];
     }, []);
-    
+
     // Handle time preset click
     const handleTimePresetClick = useCallback((presetValue: string) => {
       if (disabled) return;
@@ -788,7 +787,7 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
         }
       }
     }, [mode, disabled, calendarView]);
-    
+
     return (
       <div ref={ref} className={cn('relative w-full', className)} {...props}>
         {/* Input Field */}
@@ -839,7 +838,7 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
             )}
           </div>
         )}
-        
+
         {/* Calendar Popup */}
         {isOpen && (
           <div className={cn(
@@ -875,7 +874,7 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
                 })}
               </div>
             )}
-            
+
             {/* Calendar Container with buttons below */}
             <div className={cn(
               'flex flex-col',
@@ -887,79 +886,30 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
                 calendarView === 'single' && 'flex-col gap-3',
                 calendarView === 'multi' && 'flex-row gap-6'
               )}>
-              {/* First Calendar */}
-              <div className={cn(
-                'flex flex-col gap-3 items-start shrink-0',
-                calendarView === 'single' && 'w-full',
-                calendarView === 'multi' && 'flex-1 min-w-0'
-              )}>
-                {/* Date Header */}
-                <div className="flex items-center justify-between shrink-0 w-full">
-                  <div className="flex gap-1 items-start">
-                    <div className="flex gap-1 items-end">
-                      <p className="text-sm leading-[18px] text-[#312e4d] font-medium font-[family-name:var(--typography/font/family/body,\'Causten_Round:Medium\',sans-serif)]">
-                        {monthNames[currentMonth.getMonth()]}
-                      </p>
-                    </div>
-                    <div className="flex gap-1 items-end">
-                      <p className="text-sm leading-[18px] text-[#312e4d] font-medium font-[family-name:var(--typography/font/family/body,\'Causten_Round:Medium\',sans-serif)]">
-                        {currentMonth.getFullYear()}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex gap-2 items-start">
-                    <button
-                      type="button"
-                      onClick={handlePrevMonth}
-                      disabled={disabled}
-                      className="overflow-clip relative shrink-0 size-5 hover:opacity-70 transition-opacity cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                      aria-label="Previous month"
-                    >
-                      <ChevronLeft className="size-5 text-[#312e4d]" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleNextMonth}
-                      disabled={disabled}
-                      className="overflow-clip relative shrink-0 size-5 hover:opacity-70 transition-opacity cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                      aria-label="Next month"
-                    >
-                      <ChevronRight className="size-5 text-[#312e4d]" />
-                    </button>
-                  </div>
-                </div>
-                
-                {/* Calendar Grid */}
-                {renderCalendar(currentMonth)}
-              </div>
-              
-              {/* Second Calendar (for multi view) */}
-              {calendarView === 'multi' && (
-                <div className="flex flex-1 flex-col gap-3 items-start min-w-0 shrink-0">
+                {/* First Calendar */}
+                <div className={cn(
+                  'flex flex-col gap-3 items-start shrink-0',
+                  calendarView === 'single' && 'w-full',
+                  calendarView === 'multi' && 'flex-1 min-w-0'
+                )}>
                   {/* Date Header */}
                   <div className="flex items-center justify-between shrink-0 w-full">
                     <div className="flex gap-1 items-start">
                       <div className="flex gap-1 items-end">
-                        <p className="text-sm leading-[18px] text-[#312e4d] font-medium font-[family-name:var(--typography/font/family/body,\'Causten_Round:Medium\',sans-serif)]">
-                          {monthNames[secondMonth.getMonth()]}
+                        <p className="text-sm leading-[18px] text-[#312e4d] font-medium">
+                          {monthNames[currentMonth.getMonth()]}
                         </p>
                       </div>
                       <div className="flex gap-1 items-end">
-                        <p className="text-sm leading-[18px] text-[#312e4d] font-medium font-[family-name:var(--typography/font/family/body,\'Causten_Round:Medium\',sans-serif)]">
-                          {secondMonth.getFullYear()}
+                        <p className="text-sm leading-[18px] text-[#312e4d] font-medium">
+                          {currentMonth.getFullYear()}
                         </p>
                       </div>
                     </div>
                     <div className="flex gap-2 items-start">
                       <button
                         type="button"
-                        onClick={() => {
-                          setSecondMonth(prev => {
-                            const newMonth = new Date(prev);
-                            newMonth.setMonth(newMonth.getMonth() - 1);
-                            return newMonth;
-                          });
-                        }}
+                        onClick={handlePrevMonth}
                         disabled={disabled}
                         className="overflow-clip relative shrink-0 size-5 hover:opacity-70 transition-opacity cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="Previous month"
@@ -968,13 +918,7 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
                       </button>
                       <button
                         type="button"
-                        onClick={() => {
-                          setSecondMonth(prev => {
-                            const newMonth = new Date(prev);
-                            newMonth.setMonth(newMonth.getMonth() + 1);
-                            return newMonth;
-                          });
-                        }}
+                        onClick={handleNextMonth}
                         disabled={disabled}
                         className="overflow-clip relative shrink-0 size-5 hover:opacity-70 transition-opacity cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="Next month"
@@ -983,36 +927,91 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
                       </button>
                     </div>
                   </div>
-                  
+
                   {/* Calendar Grid */}
-                  {renderCalendar(secondMonth)}
+                  {renderCalendar(currentMonth)}
                 </div>
-              )}
+
+                {/* Second Calendar (for multi view) */}
+                {calendarView === 'multi' && (
+                  <div className="flex flex-1 flex-col gap-3 items-start min-w-0 shrink-0">
+                    {/* Date Header */}
+                    <div className="flex items-center justify-between shrink-0 w-full">
+                      <div className="flex gap-1 items-start">
+                        <div className="flex gap-1 items-end">
+                          <p className="text-sm leading-[18px] text-[#312e4d] font-medium">
+                            {monthNames[secondMonth.getMonth()]}
+                          </p>
+                        </div>
+                        <div className="flex gap-1 items-end">
+                          <p className="text-sm leading-[18px] text-[#312e4d] font-medium">
+                            {secondMonth.getFullYear()}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 items-start">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSecondMonth(prev => {
+                              const newMonth = new Date(prev);
+                              newMonth.setMonth(newMonth.getMonth() - 1);
+                              return newMonth;
+                            });
+                          }}
+                          disabled={disabled}
+                          className="overflow-clip relative shrink-0 size-5 hover:opacity-70 transition-opacity cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                          aria-label="Previous month"
+                        >
+                          <ChevronLeft className="size-5 text-[#312e4d]" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSecondMonth(prev => {
+                              const newMonth = new Date(prev);
+                              newMonth.setMonth(newMonth.getMonth() + 1);
+                              return newMonth;
+                            });
+                          }}
+                          disabled={disabled}
+                          className="overflow-clip relative shrink-0 size-5 hover:opacity-70 transition-opacity cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                          aria-label="Next month"
+                        >
+                          <ChevronRight className="size-5 text-[#312e4d]" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Calendar Grid */}
+                    {renderCalendar(secondMonth)}
+                  </div>
+                )}
               </div>
-              
+
               {/* Action Buttons - Always below calendar */}
               <div className="flex items-center justify-end gap-2 w-full mt-3">
-              <button
-                type="button"
-                onClick={handleCancel}
-                disabled={disabled}
-                className="px-4 py-2.5 rounded text-sm font-semibold text-[#00995a] font-[family-name:var(--typography/font/family/body,\'Causten_Round:Semi_Bold\',sans-serif)] hover:opacity-70 transition-opacity cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {cancelLabel}
-              </button>
-              <button
-                type="button"
-                onClick={handleSave}
-                disabled={disabled || !tempValue}
-                className={cn(
-                  'px-4 py-2.5 rounded text-sm font-semibold text-white font-[family-name:var(--typography/font/family/body,\'Causten_Round:Semi_Bold\',sans-serif)] transition-colors',
-                  tempValue ? 'bg-[#00b56b] hover:opacity-90 cursor-pointer' : 'bg-[#e0e0e0] border border-[#ecebf0] cursor-not-allowed',
-                  disabled && 'opacity-50 cursor-not-allowed'
-                )}
-              >
-                {saveLabel}
-              </button>
-            </div>
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  disabled={disabled}
+                  className="px-4 py-2.5 rounded text-sm font-semibold text-[#00995a] hover:opacity-70 transition-opacity cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {cancelLabel}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSave}
+                  disabled={disabled || !tempValue}
+                  className={cn(
+                    'px-4 py-2.5 rounded text-sm font-semibold text-white transition-colors',
+                    tempValue ? 'bg-[#00b56b] hover:opacity-90 cursor-pointer' : 'bg-[#e0e0e0] border border-[#ecebf0] cursor-not-allowed',
+                    disabled && 'opacity-50 cursor-not-allowed'
+                  )}
+                >
+                  {saveLabel}
+                </button>
+              </div>
             </div>
           </div>
         )}
