@@ -281,7 +281,7 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                   <Button
                     variant={button.variant === 'outline' ? 'secondary' : 'primary'}
                     onClick={button.onClick}
-                    className="h-11"
+                    className="h-11 font-medium"
                   >
                     {button.label}
                   </Button>
