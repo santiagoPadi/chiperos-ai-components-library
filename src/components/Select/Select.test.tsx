@@ -1,8 +1,13 @@
 import React from 'react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeAll } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Select, SelectOption } from './index';
+
+// Mock scrollIntoView for jsdom
+beforeAll(() => {
+  Element.prototype.scrollIntoView = vi.fn();
+});
 
 const mockOptions: SelectOption[] = [
   { id: '1', text: 'Option 1' },
@@ -33,8 +38,8 @@ describe('Select', () => {
       expect(value).toHaveTextContent('Option 2');
     });
 
-    it('renders with label', () => {
-      render(<Select options={mockOptions} label="Choose" value="1" />);
+    it('renders with label when no value selected', () => {
+      render(<Select options={mockOptions} label="Choose" />);
       
       const label = screen.getByTestId('select-label');
       expect(label).toHaveTextContent('Choose');
@@ -135,18 +140,19 @@ describe('Select', () => {
   });
 
   describe('Display Logic', () => {
-    it('shows label when value is selected', () => {
-      render(<Select options={mockOptions} value="1" placeholder="Choose item" />);
+    it('shows label when no value is selected and label prop is provided', () => {
+      render(<Select options={mockOptions} label="Choose item" placeholder="Select..." />);
       
       const label = screen.getByTestId('select-label');
       expect(label).toHaveTextContent('Choose item');
     });
 
-    it('shows label prop when provided', () => {
+    it('hides label when value is selected', () => {
       render(<Select options={mockOptions} label="Custom Label" value="1" />);
       
-      const label = screen.getByTestId('select-label');
-      expect(label).toHaveTextContent('Custom Label');
+      // Label should NOT be visible when a value is selected
+      const label = screen.queryByTestId('select-label');
+      expect(label).not.toBeInTheDocument();
     });
 
     it('does not show label when no value selected and no label prop', () => {
@@ -284,6 +290,188 @@ describe('Select', () => {
       
       const value = screen.getByTestId('select-value');
       expect(value).toHaveTextContent('Select an option');
+    });
+  });
+});
+
+describe('Select Multiple', () => {
+  const mockOptions: SelectOption[] = [
+    { id: '1', text: 'Option 1' },
+    { id: '2', text: 'Option 2' },
+    { id: '3', text: 'Option 3' },
+  ];
+
+  describe('Rendering', () => {
+    it('renders correctly with multiple prop', () => {
+      render(<Select multiple options={mockOptions} />);
+      
+      const trigger = screen.getByTestId('select-trigger');
+      expect(trigger).toBeInTheDocument();
+    });
+
+    it('renders with placeholder when no options selected', () => {
+      render(<Select multiple options={mockOptions} placeholder="Select items" />);
+      
+      const value = screen.getByTestId('select-value');
+      expect(value).toHaveTextContent('Select items');
+    });
+
+    it('renders single selected option text', () => {
+      render(<Select multiple options={mockOptions} value={['1']} />);
+      
+      const value = screen.getByTestId('select-value');
+      expect(value).toHaveTextContent('Option 1');
+    });
+
+    it('renders comma-separated text for two selected options', () => {
+      render(<Select multiple options={mockOptions} value={['1', '2']} />);
+      
+      const value = screen.getByTestId('select-value');
+      expect(value).toHaveTextContent('Option 1, Option 2');
+    });
+
+    it('renders count for more than two selected options', () => {
+      render(<Select multiple options={mockOptions} value={['1', '2', '3']} />);
+      
+      const value = screen.getByTestId('select-value');
+      expect(value).toHaveTextContent('3 selected');
+    });
+  });
+
+  describe('States', () => {
+    it('renders disabled state', () => {
+      render(<Select multiple options={mockOptions} disabled />);
+      
+      const trigger = screen.getByTestId('select-trigger');
+      expect(trigger).toBeDisabled();
+    });
+
+    it('does not open when disabled', () => {
+      render(<Select multiple options={mockOptions} disabled />);
+      
+      const trigger = screen.getByTestId('select-trigger');
+      fireEvent.click(trigger);
+      
+      expect(screen.queryByTestId('select-content')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Interactions', () => {
+    it('opens dropdown when clicked', async () => {
+      render(<Select multiple options={mockOptions} />);
+      
+      const trigger = screen.getByTestId('select-trigger');
+      fireEvent.click(trigger);
+      
+      await waitFor(() => {
+        expect(screen.getByTestId('select-content')).toBeInTheDocument();
+      });
+    });
+
+    it('displays all options with checkboxes when opened', async () => {
+      render(<Select multiple options={mockOptions} />);
+      
+      const trigger = screen.getByTestId('select-trigger');
+      fireEvent.click(trigger);
+      
+      await waitFor(() => {
+        mockOptions.forEach((option) => {
+          expect(screen.getByTestId(`select-option-${option.id}`)).toBeInTheDocument();
+        });
+      });
+    });
+
+    it('calls onChange with array when option is selected', async () => {
+      const handleChange = vi.fn();
+      render(<Select multiple options={mockOptions} value={[]} onChange={handleChange} />);
+      
+      const trigger = screen.getByTestId('select-trigger');
+      fireEvent.click(trigger);
+      
+      await waitFor(() => {
+        const option = screen.getByTestId('select-option-2');
+        fireEvent.click(option);
+      });
+      
+      expect(handleChange).toHaveBeenCalledWith(['2']);
+    });
+
+    it('adds option to existing selection', async () => {
+      const handleChange = vi.fn();
+      render(<Select multiple options={mockOptions} value={['1']} onChange={handleChange} />);
+      
+      const trigger = screen.getByTestId('select-trigger');
+      fireEvent.click(trigger);
+      
+      await waitFor(() => {
+        const option = screen.getByTestId('select-option-2');
+        fireEvent.click(option);
+      });
+      
+      expect(handleChange).toHaveBeenCalledWith(['1', '2']);
+    });
+
+    it('removes option from selection when clicked again', async () => {
+      const handleChange = vi.fn();
+      render(<Select multiple options={mockOptions} value={['1', '2']} onChange={handleChange} />);
+      
+      const trigger = screen.getByTestId('select-trigger');
+      fireEvent.click(trigger);
+      
+      await waitFor(() => {
+        const option = screen.getByTestId('select-option-1');
+        fireEvent.click(option);
+      });
+      
+      expect(handleChange).toHaveBeenCalledWith(['2']);
+    });
+
+    it('clears all selections when clear button is clicked', async () => {
+      const handleChange = vi.fn();
+      render(<Select multiple options={mockOptions} value={['1', '2']} onChange={handleChange} />);
+      
+      const clearButton = screen.getByTestId('select-clear');
+      fireEvent.click(clearButton);
+      
+      expect(handleChange).toHaveBeenCalledWith([]);
+    });
+
+    it('does not show clear button when no options are selected', () => {
+      render(<Select multiple options={mockOptions} value={[]} />);
+      
+      expect(screen.queryByTestId('select-clear')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Styling', () => {
+    it('applies custom className', () => {
+      render(<Select multiple options={mockOptions} className="custom-class" />);
+      
+      const trigger = screen.getByTestId('select-trigger');
+      expect(trigger).toHaveClass('custom-class');
+    });
+
+    it('shows chevron icon', () => {
+      render(<Select multiple options={mockOptions} />);
+      
+      const icon = screen.getByTestId('select-icon');
+      expect(icon).toBeInTheDocument();
+    });
+  });
+
+  describe('Accessibility', () => {
+    it('has correct aria-label', () => {
+      render(<Select multiple options={mockOptions} placeholder="Choose options" />);
+      
+      const trigger = screen.getByTestId('select-trigger');
+      expect(trigger).toHaveAttribute('aria-label', 'Choose options');
+    });
+
+    it('uses label for aria-label when provided', () => {
+      render(<Select multiple options={mockOptions} label="Custom Label" />);
+      
+      const trigger = screen.getByTestId('select-trigger');
+      expect(trigger).toHaveAttribute('aria-label', 'Custom Label');
     });
   });
 });

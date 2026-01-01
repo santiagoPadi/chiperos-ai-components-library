@@ -12,7 +12,7 @@ const meta = {
   argTypes: {
     value: {
       control: 'text',
-      description: 'The currently selected option ID',
+      description: 'The currently selected option ID (string for single, array for multiple)',
     },
     placeholder: {
       control: 'text',
@@ -30,6 +30,10 @@ const meta = {
     disabled: {
       control: 'boolean',
       description: 'Whether the select is disabled',
+    },
+    multiple: {
+      control: 'boolean',
+      description: 'Enable multiple selection mode',
     },
     options: {
       control: 'object',
@@ -559,5 +563,251 @@ export const PrimaryInHeader: Story = {
     options: [],
     label: '',
   },
+};
+
+// ==================== MULTIPLE SELECT ====================
+
+const categoryOptions: SelectOption[] = [
+  { id: 'electronics', text: 'Electronics' },
+  { id: 'clothing', text: 'Clothing' },
+  { id: 'food', text: 'Food & Beverages' },
+  { id: 'home', text: 'Home & Garden' },
+  { id: 'sports', text: 'Sports & Outdoors' },
+  { id: 'toys', text: 'Toys & Games' },
+];
+
+const statusOptions: SelectOption[] = [
+  { id: 'active', text: 'Active' },
+  { id: 'pending', text: 'Pending' },
+  { id: 'completed', text: 'Completed' },
+  { id: 'cancelled', text: 'Cancelled' },
+  { id: 'refunded', text: 'Refunded' },
+];
+
+// Wrapper for multiple select
+const MultiSelectWrapper = (args: any) => {
+  const [value, setValue] = useState<string[]>(args.value || []);
+  
+  return (
+    <div style={{ width: '300px' }}>
+      <Select
+        {...args}
+        multiple
+        value={value}
+        onChange={(newValue: string[]) => {
+          setValue(newValue);
+          args.onChange?.(newValue);
+        }}
+      />
+    </div>
+  );
+};
+
+export const MultipleSelect: Story = {
+  args: {
+    options: categoryOptions,
+    placeholder: 'Select categories',
+    multiple: true,
+  },
+  render: (args) => <MultiSelectWrapper {...args} />,
+};
+
+export const MultipleWithLabel: Story = {
+  args: {
+    options: statusOptions,
+    label: 'Filter by Status',
+    placeholder: 'Select statuses',
+    multiple: true,
+  },
+  render: (args) => <MultiSelectWrapper {...args} />,
+};
+
+export const MultipleWithPreselected: Story = {
+  args: {
+    options: categoryOptions,
+    label: 'Categories',
+    placeholder: 'Select categories',
+    multiple: true,
+    value: ['electronics', 'clothing'],
+  },
+  render: (args) => <MultiSelectWrapper {...args} />,
+};
+
+export const MultipleDisabled: Story = {
+  args: {
+    options: categoryOptions,
+    placeholder: 'Select categories',
+    multiple: true,
+    disabled: true,
+  },
+  render: (args) => <MultiSelectWrapper {...args} />,
+};
+
+export const MultiplePrimaryVariant: Story = {
+  args: {
+    options: statusOptions,
+    placeholder: 'Filter Status',
+    variant: 'primary',
+    multiple: true,
+  },
+  render: (args) => {
+    const [value, setValue] = useState<string[]>([]);
+    
+    return (
+      <Select
+        {...args}
+        multiple
+        value={value}
+        onChange={setValue}
+      />
+    );
+  },
+};
+
+export const MultipleManyOptions: Story = {
+  args: {
+    options: [
+      ...Array.from({ length: 15 }, (_, i) => ({
+        id: `${i + 1}`,
+        text: `Option ${i + 1}`,
+      })),
+    ],
+    placeholder: 'Select from many options',
+    multiple: true,
+  },
+  render: (args) => <MultiSelectWrapper {...args} />,
+};
+
+export const MultipleInteractive: Story = {
+  render: () => {
+    const [value, setValue] = useState<string[]>(['electronics', 'food']);
+    const [disabled, setDisabled] = useState(false);
+    
+    return (
+      <div style={{ width: '400px' }}>
+        <div style={{ marginBottom: '16px' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px' }}>
+            <input
+              type="checkbox"
+              checked={disabled}
+              onChange={(e) => setDisabled(e.target.checked)}
+            />
+            Disable select
+          </label>
+        </div>
+        
+        <Select
+          multiple
+          options={categoryOptions}
+          label="Categories"
+          placeholder="Select categories"
+          value={value}
+          onChange={setValue}
+          disabled={disabled}
+        />
+        
+        <div style={{ marginTop: '16px', padding: '12px', backgroundColor: '#f4f4f4', borderRadius: '4px' }}>
+          <p style={{ margin: 0, fontSize: '14px' }}>
+            <strong>Selected Values:</strong> {value.length > 0 ? value.join(', ') : 'None'}
+          </p>
+        </div>
+      </div>
+    );
+  },
+  args: { options: [] },
+};
+
+export const SingleVsMultiple: Story = {
+  render: () => {
+    const [singleValue, setSingleValue] = useState('');
+    const [multipleValue, setMultipleValue] = useState<string[]>([]);
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', width: '400px' }}>
+        <div>
+          <h3 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Single Select</h3>
+          <Select
+            options={categoryOptions}
+            placeholder="Select one category"
+            value={singleValue}
+            onChange={setSingleValue}
+          />
+          <p style={{ marginTop: '8px', fontSize: '12px', color: '#666' }}>
+            Selected: {singleValue || 'None'}
+          </p>
+        </div>
+
+        <div>
+          <h3 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Multiple Select</h3>
+          <Select
+            multiple
+            options={categoryOptions}
+            placeholder="Select multiple categories"
+            value={multipleValue}
+            onChange={setMultipleValue}
+          />
+          <p style={{ marginTop: '8px', fontSize: '12px', color: '#666' }}>
+            Selected: {multipleValue.length > 0 ? multipleValue.join(', ') : 'None'}
+          </p>
+        </div>
+      </div>
+    );
+  },
+  args: { options: [] },
+};
+
+export const MultipleFilterExample: Story = {
+  render: () => {
+    const [categories, setCategories] = useState<string[]>([]);
+    const [statuses, setStatuses] = useState<string[]>([]);
+
+    return (
+      <div style={{
+        padding: '24px',
+        backgroundColor: '#f8f8f8',
+        borderRadius: '8px',
+        width: '600px',
+      }}>
+        <h2 style={{ margin: '0 0 16px', fontSize: '18px', fontWeight: 600 }}>Filter Products</h2>
+        
+        <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+          <div style={{ flex: '1 1 200px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500 }}>
+              Categories
+            </label>
+            <Select
+              multiple
+              options={categoryOptions}
+              placeholder="All categories"
+              value={categories}
+              onChange={setCategories}
+            />
+          </div>
+          
+          <div style={{ flex: '1 1 200px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500 }}>
+              Status
+            </label>
+            <Select
+              multiple
+              options={statusOptions}
+              placeholder="All statuses"
+              value={statuses}
+              onChange={setStatuses}
+            />
+          </div>
+        </div>
+
+        <div style={{ marginTop: '16px', padding: '12px', backgroundColor: 'white', borderRadius: '4px', fontSize: '14px' }}>
+          <strong>Active Filters:</strong>
+          <ul style={{ margin: '8px 0 0', paddingLeft: '20px' }}>
+            <li>Categories: {categories.length > 0 ? categories.join(', ') : 'All'}</li>
+            <li>Statuses: {statuses.length > 0 ? statuses.join(', ') : 'All'}</li>
+          </ul>
+        </div>
+      </div>
+    );
+  },
+  args: { options: [] },
 };
 
