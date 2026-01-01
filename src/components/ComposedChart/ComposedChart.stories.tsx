@@ -156,3 +156,41 @@ export const Minimal: Story = {
         height: 300,
     },
 };
+
+/**
+ * Chart with title and axis labels
+ */
+export const WithTitles: Story = {
+    args: {
+        data: monthlyData,
+        xAxisKey: 'month',
+        series: [
+            { type: 'bar', dataKey: 'sales', name: 'Sales', color: '#00995a' },
+            { type: 'line', dataKey: 'revenue', name: 'Revenue', color: '#312e4d' },
+        ],
+        title: 'Monthly Sales Performance',
+        xAxisLabel: 'Month',
+        yAxisLabel: 'Amount ($)',
+        height: 450,
+    },
+};
+
+/**
+ * Dual Y-axis chart with labels on both axes
+ */
+export const DualYAxisWithLabels: Story = {
+    args: {
+        data: monthlyData,
+        xAxisKey: 'month',
+        series: [
+            { type: 'bar', dataKey: 'sales', name: 'Sales', color: '#00995a', yAxisId: 'left' },
+            { type: 'line', dataKey: 'revenue', name: 'Revenue', color: '#ff305f', yAxisId: 'right' },
+        ],
+        showRightYAxis: true,
+        title: 'Sales vs Revenue Comparison',
+        xAxisLabel: 'Month',
+        yAxisLabel: 'Sales (units)',
+        yAxisRightLabel: 'Revenue ($)',
+        height: 450,
+    },
+};

@@ -115,6 +115,26 @@ export interface ComposedChartProps {
      * Bar size in pixels
      */
     barSize?: number;
+
+    /**
+     * Main title of the chart
+     */
+    title?: string;
+
+    /**
+     * Label for the X-axis
+     */
+    xAxisLabel?: string;
+
+    /**
+     * Label for the left Y-axis
+     */
+    yAxisLabel?: string;
+
+    /**
+     * Label for the right Y-axis (only shown when showRightYAxis is true)
+     */
+    yAxisRightLabel?: string;
 }
 
 // Default color palette
@@ -145,22 +165,58 @@ const DEFAULT_COLORS = [
  *     { type: 'bar', dataKey: 'sales', name: 'Sales', color: '#00995a' },
  *     { type: 'line', dataKey: 'revenue', name: 'Revenue', color: '#312e4d' },
  *   ]}
+ *   title="Monthly Performance"
+ *   xAxisLabel="Month"
+ *   yAxisLabel="Amount"
  * />
  * ```
  */
 export const ComposedChart: React.FC<ComposedChartProps> = ({
-    data,
-    series,
+    data: dataProp,
+    series: seriesProp,
     xAxisKey,
     height = 400,
     showGrid = true,
     showLegend = true,
     showTooltip = true,
     showRightYAxis = false,
-    margin = { top: 20, right: 30, left: 20, bottom: 5 },
+    margin,
     barGap = 4,
     barSize,
+    title,
+    xAxisLabel,
+    yAxisLabel,
+    yAxisRightLabel,
 }) => {
+    // Create deep copies of data and series to avoid readonly issues in Storybook
+    const data = React.useMemo(() => 
+        dataProp.map(item => ({ ...item })), 
+        [dataProp]
+    );
+    
+    const series = React.useMemo(() => 
+        seriesProp.map(s => ({ ...s })), 
+        [seriesProp]
+    );
+
+    // Adjust margins based on labels (title is now rendered outside the chart)
+    const chartMargin = React.useMemo(() => {
+        if (margin) {
+            return {
+                top: margin.top ?? 20,
+                right: margin.right ?? 30,
+                left: margin.left ?? 20,
+                bottom: margin.bottom ?? 5,
+            };
+        }
+        return {
+            top: 20,
+            right: showRightYAxis && yAxisRightLabel ? 60 : 30,
+            left: yAxisLabel ? 60 : 20,
+            bottom: xAxisLabel ? 40 : 5,
+        };
+    }, [margin, showRightYAxis, yAxisRightLabel, yAxisLabel, xAxisLabel]);
+
     const getSeriesColor = (index: number, customColor?: string): string => {
         return customColor || DEFAULT_COLORS[index % DEFAULT_COLORS.length];
     };
@@ -168,38 +224,41 @@ export const ComposedChart: React.FC<ComposedChartProps> = ({
     const renderSeries = () => {
         return series.map((s, index) => {
             const color = getSeriesColor(index, s.color);
-            const commonProps = {
-                key: `${s.type}-${s.dataKey}`,
-                dataKey: s.dataKey,
-                name: s.name || s.dataKey,
-                yAxisId: s.yAxisId || 'left',
-            };
 
             switch (s.type) {
                 case 'bar':
                     return (
                         <Bar
-                            {...commonProps}
+                            key={`bar-${s.dataKey}-${index}`}
+                            dataKey={s.dataKey}
+                            name={s.name || s.dataKey}
+                            yAxisId={s.yAxisId || 'left'}
                             fill={color}
                             stackId={s.stackId}
-                            radius={[4, 4, 0, 0]}
+                            radius={[4, 4, 0, 0] as [number, number, number, number]}
                         />
                     );
                 case 'line':
                     return (
                         <Line
-                            {...commonProps}
+                            key={`line-${s.dataKey}-${index}`}
+                            dataKey={s.dataKey}
+                            name={s.name || s.dataKey}
+                            yAxisId={s.yAxisId || 'left'}
                             type="monotone"
                             stroke={color}
                             strokeWidth={2}
-                            dot={{ fill: color, strokeWidth: 2 }}
+                            dot={false}
                             activeDot={{ r: 6 }}
                         />
                     );
                 case 'area':
                     return (
                         <Area
-                            {...commonProps}
+                            key={`area-${s.dataKey}-${index}`}
+                            dataKey={s.dataKey}
+                            name={s.name || s.dataKey}
+                            yAxisId={s.yAxisId || 'left'}
                             type="monotone"
                             stroke={color}
                             fill={color}
@@ -214,68 +273,103 @@ export const ComposedChart: React.FC<ComposedChartProps> = ({
     };
 
     return (
-        <ResponsiveContainer width="100%" height={height}>
-            <RechartsComposedChart
-                data={data}
-                margin={margin}
-                barGap={barGap}
-                barSize={barSize}
-            >
-                {showGrid && (
-                    <CartesianGrid
-                        strokeDasharray="3 3"
-                        stroke="#ecebf0"
-                        vertical={false}
-                    />
-                )}
+        <div style={{ width: '100%' }}>
+            {title && (
+                <div
+                    style={{
+                        textAlign: 'center',
+                        fontSize: 16,
+                        fontWeight: 600,
+                        color: '#312e4d',
+                        marginBottom: 8,
+                    }}
+                >
+                    {title}
+                </div>
+            )}
+            <ResponsiveContainer width="100%" height={height}>
+                <RechartsComposedChart
+                    data={data}
+                    margin={chartMargin}
+                    barGap={barGap}
+                    barSize={barSize}
+                >
+                    {showGrid && (
+                        <CartesianGrid
+                            strokeDasharray="3 3"
+                            stroke="#ecebf0"
+                            vertical={false}
+                        />
+                    )}
 
-                <XAxis
-                    dataKey={xAxisKey}
-                    axisLine={{ stroke: '#c6c6c6' }}
-                    tickLine={false}
-                    tick={{ fill: '#575385', fontSize: 12 }}
-                />
-
-                <YAxis
-                    yAxisId="left"
-                    axisLine={{ stroke: '#c6c6c6' }}
-                    tickLine={false}
-                    tick={{ fill: '#575385', fontSize: 12 }}
-                />
-
-                {showRightYAxis && (
-                    <YAxis
-                        yAxisId="right"
-                        orientation="right"
-                        axisLine={{ stroke: '#c6c6c6' }}
+                    <XAxis
+                        dataKey={xAxisKey}
+                        stroke="#c6c6c6"
                         tickLine={false}
                         tick={{ fill: '#575385', fontSize: 12 }}
+                        label={xAxisLabel ? {
+                            value: xAxisLabel,
+                            position: 'bottom',
+                            offset: 0,
+                            style: { textAnchor: 'middle', fill: '#575385', fontSize: 12 }
+                        } : undefined}
                     />
-                )}
 
-                {showTooltip && (
-                    <Tooltip
-                        contentStyle={{
-                            backgroundColor: '#fff',
-                            border: '1px solid #ecebf0',
-                            borderRadius: '8px',
-                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                        }}
-                        labelStyle={{ color: '#312e4d', fontWeight: 600 }}
-                        itemStyle={{ color: '#575385' }}
+                    <YAxis
+                        yAxisId="left"
+                        stroke="#c6c6c6"
+                        tickLine={false}
+                        tick={{ fill: '#575385', fontSize: 12 }}
+                        label={yAxisLabel ? {
+                            value: yAxisLabel,
+                            angle: -90,
+                            position: 'insideLeft',
+                            offset: 10,
+                            style: { textAnchor: 'middle', fill: '#575385', fontSize: 12 }
+                        } : undefined}
                     />
-                )}
 
-                {showLegend && (
-                    <Legend
-                        wrapperStyle={{ paddingTop: '20px' }}
-                        iconType="circle"
-                    />
-                )}
+                    {showRightYAxis && (
+                        <YAxis
+                            yAxisId="right"
+                            orientation="right"
+                            stroke="#c6c6c6"
+                            tickLine={false}
+                            tick={{ fill: '#575385', fontSize: 12 }}
+                            label={yAxisRightLabel ? {
+                                value: yAxisRightLabel,
+                                angle: 90,
+                                position: 'insideRight',
+                                offset: 10,
+                                style: { textAnchor: 'middle', fill: '#575385', fontSize: 12 }
+                            } : undefined}
+                        />
+                    )}
 
-                {renderSeries()}
-            </RechartsComposedChart>
-        </ResponsiveContainer>
+                    {showTooltip && (
+                        <Tooltip
+                            contentStyle={{
+                                backgroundColor: '#fff',
+                                border: '1px solid #ecebf0',
+                                borderRadius: '8px',
+                                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                            }}
+                            labelStyle={{ color: '#312e4d', fontWeight: 600 }}
+                            itemStyle={{ color: '#575385' }}
+                        />
+                    )}
+
+                    {showLegend && (
+                        <Legend
+                            wrapperStyle={{ paddingTop: '20px' }}
+                            iconType="circle"
+                        />
+                    )}
+
+                    {renderSeries()}
+                </RechartsComposedChart>
+            </ResponsiveContainer>
+        </div>
     );
 };
 
