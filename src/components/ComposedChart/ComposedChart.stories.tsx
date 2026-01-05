@@ -194,3 +194,117 @@ export const DualYAxisWithLabels: Story = {
         height: 450,
     },
 };
+
+// Sample data with larger numbers for currency formatting demo
+const currencyData = [
+    { month: 'Jan', sales: 45000, revenue: 124500, profit: 32000 },
+    { month: 'Feb', sales: 38500, revenue: 98750, profit: 28500 },
+    { month: 'Mar', sales: 52000, revenue: 156200, profit: 45600 },
+    { month: 'Apr', sales: 41200, revenue: 108900, profit: 31200 },
+    { month: 'May', sales: 67800, revenue: 189000, profit: 58400 },
+    { month: 'Jun', sales: 58300, revenue: 172500, profit: 49200 },
+];
+
+/**
+ * Chart with currency formatting (without decimals)
+ * Values are formatted with thousand separators (dots) and currency symbol
+ */
+export const CurrencyFormat: Story = {
+    args: {
+        data: currencyData,
+        xAxisKey: 'month',
+        series: [
+            { type: 'bar', dataKey: 'sales', name: 'Ventas', color: '#00995a' },
+            { type: 'line', dataKey: 'revenue', name: 'Ingresos', color: '#312e4d' },
+        ],
+        title: 'Ventas Mensuales',
+        xAxisLabel: 'Mes',
+        yAxisLabel: 'Monto',
+        currencyFormat: {
+            enabled: true,
+            symbol: '$',
+            showDecimals: false,
+        },
+        height: 450,
+    },
+};
+
+/**
+ * Chart with currency formatting including decimals
+ */
+export const CurrencyFormatWithDecimals: Story = {
+    args: {
+        data: currencyData,
+        xAxisKey: 'month',
+        series: [
+            { type: 'bar', dataKey: 'sales', name: 'Ventas', color: '#00995a' },
+            { type: 'line', dataKey: 'profit', name: 'Ganancia', color: '#ff305f' },
+        ],
+        title: 'Análisis Financiero',
+        xAxisLabel: 'Mes',
+        yAxisLabel: 'Monto (MXN)',
+        currencyFormat: {
+            enabled: true,
+            symbol: 'MXN ',
+            showDecimals: true,
+            decimalPlaces: 2,
+        },
+        height: 450,
+    },
+};
+
+/**
+ * Dual Y-axis with different currency formats
+ * Left axis: USD without decimals, Right axis: EUR with decimals
+ */
+export const DualAxisCurrencyFormat: Story = {
+    args: {
+        data: currencyData,
+        xAxisKey: 'month',
+        series: [
+            { type: 'bar', dataKey: 'sales', name: 'Ventas (USD)', color: '#00995a', yAxisId: 'left' },
+            { type: 'line', dataKey: 'revenue', name: 'Ingresos (EUR)', color: '#ff305f', yAxisId: 'right' },
+        ],
+        showRightYAxis: true,
+        title: 'Comparación de Monedas',
+        xAxisLabel: 'Mes',
+        yAxisLabel: 'USD',
+        yAxisRightLabel: 'EUR',
+        currencyFormat: {
+            enabled: true,
+            symbol: '$',
+            showDecimals: false,
+        },
+        currencyFormatRight: {
+            enabled: true,
+            symbol: '€',
+            showDecimals: true,
+            decimalPlaces: 2,
+        },
+        height: 450,
+    },
+};
+
+/**
+ * Currency format with symbol as suffix
+ */
+export const CurrencyFormatSuffix: Story = {
+    args: {
+        data: currencyData,
+        xAxisKey: 'month',
+        series: [
+            { type: 'area', dataKey: 'profit', name: 'Ganancia', color: '#4a90d9' },
+            { type: 'bar', dataKey: 'sales', name: 'Ventas', color: '#00995a' },
+        ],
+        title: 'Reporte en Pesos',
+        xAxisLabel: 'Mes',
+        yAxisLabel: 'Monto',
+        currencyFormat: {
+            enabled: true,
+            symbol: 'MXN',
+            showDecimals: false,
+            symbolPosition: 'suffix',
+        },
+        height: 450,
+    },
+};

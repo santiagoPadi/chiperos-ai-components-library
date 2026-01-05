@@ -49,6 +49,41 @@ export interface ComposedChartSeries {
     yAxisId?: 'left' | 'right';
 }
 
+/**
+ * Currency format configuration
+ */
+export interface CurrencyFormatConfig {
+    /**
+     * Whether to format values as currency
+     * @default false
+     */
+    enabled: boolean;
+
+    /**
+     * Currency symbol to display (e.g., "$", "€", "MXN")
+     * @default "$"
+     */
+    symbol?: string;
+
+    /**
+     * Whether to show decimal places
+     * @default false
+     */
+    showDecimals?: boolean;
+
+    /**
+     * Number of decimal places to show (only when showDecimals is true)
+     * @default 2
+     */
+    decimalPlaces?: number;
+
+    /**
+     * Position of the currency symbol
+     * @default "prefix"
+     */
+    symbolPosition?: 'prefix' | 'suffix';
+}
+
 export interface ComposedChartProps {
     /**
      * Array of data objects to display
@@ -135,6 +170,20 @@ export interface ComposedChartProps {
      * Label for the right Y-axis (only shown when showRightYAxis is true)
      */
     yAxisRightLabel?: string;
+
+    /**
+     * Currency format configuration for the left Y-axis
+     * When enabled, values will be formatted with thousand separators (dots)
+     * and optional currency symbol
+     */
+    currencyFormat?: CurrencyFormatConfig;
+
+    /**
+     * Currency format configuration for the right Y-axis
+     * When enabled, values will be formatted with thousand separators (dots)
+     * and optional currency symbol
+     */
+    currencyFormatRight?: CurrencyFormatConfig;
 }
 
 // Default color palette
@@ -146,6 +195,42 @@ const DEFAULT_COLORS = [
     '#f5a623', // Orange
     '#4a90d9', // Blue
 ];
+
+/**
+ * Formats a number as currency with dot as thousand separator
+ * @param value - The number to format
+ * @param config - Currency format configuration
+ * @returns Formatted currency string
+ */
+const formatCurrency = (value: number, config: CurrencyFormatConfig): string => {
+    const {
+        symbol = '$',
+        showDecimals = false,
+        decimalPlaces = 2,
+        symbolPosition = 'prefix',
+    } = config;
+
+    // Format number with thousand separators (dots) and optional decimals
+    let formattedNumber: string;
+    
+    if (showDecimals) {
+        // Format with decimals using comma as decimal separator
+        const fixedNumber = value.toFixed(decimalPlaces);
+        const [integerPart, decimalPart] = fixedNumber.split('.');
+        const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        formattedNumber = `${formattedInteger},${decimalPart}`;
+    } else {
+        // Format without decimals
+        const roundedValue = Math.round(value);
+        formattedNumber = roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+
+    // Add currency symbol
+    if (symbolPosition === 'suffix') {
+        return `${formattedNumber} ${symbol}`;
+    }
+    return `${symbol}${formattedNumber}`;
+};
 
 /**
  * ComposedChart Component
@@ -187,6 +272,8 @@ export const ComposedChart: React.FC<ComposedChartProps> = ({
     xAxisLabel,
     yAxisLabel,
     yAxisRightLabel,
+    currencyFormat,
+    currencyFormatRight,
 }) => {
     // Create deep copies of data and series to avoid readonly issues in Storybook
     const data = React.useMemo(() => 
@@ -220,6 +307,39 @@ export const ComposedChart: React.FC<ComposedChartProps> = ({
     const getSeriesColor = (index: number, customColor?: string): string => {
         return customColor || DEFAULT_COLORS[index % DEFAULT_COLORS.length];
     };
+
+    // Create tick formatters for Y axes
+    const leftAxisFormatter = React.useCallback((value: number): string => {
+        if (currencyFormat?.enabled) {
+            return formatCurrency(value, currencyFormat);
+        }
+        return value.toString();
+    }, [currencyFormat]);
+
+    const rightAxisFormatter = React.useCallback((value: number): string => {
+        if (currencyFormatRight?.enabled) {
+            return formatCurrency(value, currencyFormatRight);
+        }
+        return value.toString();
+    }, [currencyFormatRight]);
+
+    // Custom tooltip formatter
+    const tooltipFormatter = React.useCallback((value: number, name: string): [string, string] => {
+        // Find the series config for this data key
+        const seriesConfig = series.find(s => s.name === name || s.dataKey === name);
+        const yAxisId = seriesConfig?.yAxisId || 'left';
+        
+        let formattedValue: string;
+        if (yAxisId === 'right' && currencyFormatRight?.enabled) {
+            formattedValue = formatCurrency(value, currencyFormatRight);
+        } else if (yAxisId === 'left' && currencyFormat?.enabled) {
+            formattedValue = formatCurrency(value, currencyFormat);
+        } else {
+            formattedValue = value.toString();
+        }
+        
+        return [formattedValue, name];
+    }, [series, currencyFormat, currencyFormatRight]);
 
     const renderSeries = () => {
         return series.map((s, index) => {
@@ -320,6 +440,7 @@ export const ComposedChart: React.FC<ComposedChartProps> = ({
                         stroke="#c6c6c6"
                         tickLine={false}
                         tick={{ fill: '#575385', fontSize: 12 }}
+                        tickFormatter={currencyFormat?.enabled ? leftAxisFormatter : undefined}
                         label={yAxisLabel ? {
                             value: yAxisLabel,
                             angle: -90,
@@ -336,6 +457,7 @@ export const ComposedChart: React.FC<ComposedChartProps> = ({
                             stroke="#c6c6c6"
                             tickLine={false}
                             tick={{ fill: '#575385', fontSize: 12 }}
+                            tickFormatter={currencyFormatRight?.enabled ? rightAxisFormatter : undefined}
                             label={yAxisRightLabel ? {
                                 value: yAxisRightLabel,
                                 angle: 90,
@@ -356,6 +478,7 @@ export const ComposedChart: React.FC<ComposedChartProps> = ({
                             }}
                             labelStyle={{ color: '#312e4d', fontWeight: 600 }}
                             itemStyle={{ color: '#575385' }}
+                            formatter={(currencyFormat?.enabled || currencyFormatRight?.enabled) ? tooltipFormatter : undefined}
                         />
                     )}
 
