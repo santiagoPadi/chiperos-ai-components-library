@@ -26,13 +26,18 @@ interface BaseFilter {
 }
 
 /**
- * Select filter type
+ * Select filter type (single selection)
  */
 export interface SelectFilter extends BaseFilter {
     /**
      * Filter type
      */
     type?: 'select';
+
+    /**
+     * Enable multiple selection
+     */
+    multiple?: false;
 
     /**
      * Options for dropdown filter
@@ -48,6 +53,36 @@ export interface SelectFilter extends BaseFilter {
      * Callback when filter changes
      */
     onChange?: (value: string) => void;
+}
+
+/**
+ * Multi-select filter type (multiple selection)
+ */
+export interface MultiSelectFilter extends BaseFilter {
+    /**
+     * Filter type
+     */
+    type?: 'select';
+
+    /**
+     * Enable multiple selection
+     */
+    multiple: true;
+
+    /**
+     * Options for dropdown filter
+     */
+    options: SelectOption[];
+
+    /**
+     * Selected values (array of ids)
+     */
+    value?: string[];
+
+    /**
+     * Callback when filter changes
+     */
+    onChange?: (values: string[]) => void;
 }
 
 /**
@@ -103,7 +138,7 @@ export interface DateRangeFilter extends BaseFilter {
 /**
  * Union type for all filter types
  */
-export type FilterContainerFilter = SelectFilter | DateRangeFilter;
+export type FilterContainerFilter = SelectFilter | MultiSelectFilter | DateRangeFilter;
 
 export interface FilterContainerProps {
     /**
@@ -209,7 +244,28 @@ export const FilterContainer: React.FC<FilterContainerProps> = ({
                         );
                     }
 
-                    // Default: Select filter
+                    // Multi-select filter
+                    if (filter.multiple) {
+                        return (
+                            <div
+                                key={filter.key}
+                                className="min-w-[160px] flex-shrink-0"
+                                data-testid={`filter-container-filter-${filter.key}`}
+                            >
+                                <Select
+                                    multiple
+                                    options={filter.options}
+                                    value={filter.value}
+                                    onChange={(values) => filter.onChange?.(values)}
+                                    placeholder={filter.placeholder || filter.label}
+                                    label={filter.label}
+                                    className="h-11"
+                                />
+                            </div>
+                        );
+                    }
+
+                    // Default: Single select filter
                     return (
                         <div
                             key={filter.key}

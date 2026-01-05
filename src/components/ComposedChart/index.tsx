@@ -296,13 +296,32 @@ export const ComposedChart: React.FC<ComposedChartProps> = ({
                 bottom: margin.bottom ?? 5,
             };
         }
+        
+        // Calculate left margin based on currency format and label
+        let leftMargin = 20;
+        if (currencyFormat?.enabled) {
+            leftMargin = 80; // More space for formatted currency values
+        } else if (yAxisLabel) {
+            leftMargin = 60;
+        }
+        
+        // Calculate right margin based on currency format and label
+        let rightMargin = 30;
+        if (showRightYAxis) {
+            if (currencyFormatRight?.enabled) {
+                rightMargin = 80;
+            } else if (yAxisRightLabel) {
+                rightMargin = 60;
+            }
+        }
+        
         return {
             top: 20,
-            right: showRightYAxis && yAxisRightLabel ? 60 : 30,
-            left: yAxisLabel ? 60 : 20,
+            right: rightMargin,
+            left: leftMargin,
             bottom: xAxisLabel ? 40 : 5,
         };
-    }, [margin, showRightYAxis, yAxisRightLabel, yAxisLabel, xAxisLabel]);
+    }, [margin, showRightYAxis, yAxisRightLabel, yAxisLabel, xAxisLabel, currencyFormat, currencyFormatRight]);
 
     const getSeriesColor = (index: number, customColor?: string): string => {
         return customColor || DEFAULT_COLORS[index % DEFAULT_COLORS.length];
@@ -324,7 +343,13 @@ export const ComposedChart: React.FC<ComposedChartProps> = ({
     }, [currencyFormatRight]);
 
     // Custom tooltip formatter
-    const tooltipFormatter = React.useCallback((value: number, name: string): [string, string] => {
+    const tooltipFormatter = React.useCallback((value: number | undefined, name: string | undefined): [string, string] => {
+        const displayName = name || '';
+        
+        if (value === undefined) {
+            return ['—', displayName];
+        }
+        
         // Find the series config for this data key
         const seriesConfig = series.find(s => s.name === name || s.dataKey === name);
         const yAxisId = seriesConfig?.yAxisId || 'left';
@@ -338,7 +363,7 @@ export const ComposedChart: React.FC<ComposedChartProps> = ({
             formattedValue = value.toString();
         }
         
-        return [formattedValue, name];
+        return [formattedValue, displayName];
     }, [series, currencyFormat, currencyFormatRight]);
 
     const renderSeries = () => {
@@ -445,7 +470,7 @@ export const ComposedChart: React.FC<ComposedChartProps> = ({
                             value: yAxisLabel,
                             angle: -90,
                             position: 'insideLeft',
-                            offset: 10,
+                            dx: -15,
                             style: { textAnchor: 'middle', fill: '#575385', fontSize: 12 }
                         } : undefined}
                     />
@@ -462,7 +487,7 @@ export const ComposedChart: React.FC<ComposedChartProps> = ({
                                 value: yAxisRightLabel,
                                 angle: 90,
                                 position: 'insideRight',
-                                offset: 10,
+                                dx: 15,
                                 style: { textAnchor: 'middle', fill: '#575385', fontSize: 12 }
                             } : undefined}
                         />

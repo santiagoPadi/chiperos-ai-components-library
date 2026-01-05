@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
-import { FilterContainer, FilterContainerFilter, DateRangeValue } from './index';
+import { FilterContainer, FilterContainerFilter, DateRangeValue, MultiSelectFilter } from './index';
 
 const meta: Meta<typeof FilterContainer> = {
     title: 'Components/FilterContainer',
@@ -163,6 +163,89 @@ export const DisabledButtons: Story = {
         applyDisabled: true,
         downloadDisabled: true,
         restartDisabled: true,
+    },
+};
+
+/**
+ * With Multi-Select filter - allows selecting multiple options
+ */
+export const WithMultiSelect: Story = {
+    render: function WithMultiSelectFilterContainer() {
+        const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
+        const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+        const [singleStatus, setSingleStatus] = useState<string>('');
+
+        const handleApply = () => {
+            const allFilters = {
+                countries: selectedCountries,
+                categories: selectedCategories,
+                status: singleStatus,
+            };
+            console.log('Applied filters:', allFilters);
+            alert(`Applied filters:\n${JSON.stringify(allFilters, null, 2)}`);
+        };
+
+        const handleRestart = () => {
+            setSelectedCountries([]);
+            setSelectedCategories([]);
+            setSingleStatus('');
+            alert('Filters reset!');
+        };
+
+        const filters: FilterContainerFilter[] = [
+            {
+                key: 'countries',
+                label: 'Countries',
+                placeholder: 'Select countries',
+                options: countryOptions.filter(o => o.id !== 'all'), // Remove "All" option for multiselect
+                multiple: true,
+                value: selectedCountries,
+                onChange: setSelectedCountries,
+            } as MultiSelectFilter,
+            {
+                key: 'categories',
+                label: 'Categories',
+                placeholder: 'Select categories',
+                options: categoryOptions.filter(o => o.id !== 'all'),
+                multiple: true,
+                value: selectedCategories,
+                onChange: setSelectedCategories,
+            } as MultiSelectFilter,
+            {
+                key: 'status',
+                label: 'Status',
+                placeholder: 'Select status',
+                options: statusOptions,
+                value: singleStatus,
+                onChange: setSingleStatus,
+            },
+        ];
+
+        return (
+            <div className="space-y-4">
+                <FilterContainer
+                    filters={filters}
+                    onApply={handleApply}
+                    onDownload={() => alert('Download clicked')}
+                    onRestart={handleRestart}
+                    applyLabel="Apply Filters"
+                />
+                <div className="bg-gray-100 p-4 rounded-lg">
+                    <h4 className="font-semibold mb-2">Current Filter Values:</h4>
+                    <pre className="text-sm">
+                        {JSON.stringify(
+                            {
+                                countries: selectedCountries,
+                                categories: selectedCategories,
+                                status: singleStatus,
+                            },
+                            null,
+                            2
+                        )}
+                    </pre>
+                </div>
+            </div>
+        );
     },
 };
 
