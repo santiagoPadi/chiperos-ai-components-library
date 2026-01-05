@@ -437,6 +437,8 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
     const [tempValue, setTempValue] = useState<SelectedDates>(value);
     // Track which preset is currently selected
     const [selectedPreset, setSelectedPreset] = useState<string | null>(null);
+    // Track if we're selecting the start date (first click) or end date (second click) in range mode
+    const [isSelectingStart, setIsSelectingStart] = useState<boolean>(true);
 
     const isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;
 
@@ -445,6 +447,8 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
       if (isOpen) {
         setTempValue(value);
         setSelectedPreset(null);
+        // Reset to selecting start when opening
+        setIsSelectingStart(true);
       }
     }, [isOpen, value]);
 
@@ -454,10 +458,11 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
       } else {
         setInternalOpen(newOpen);
       }
-      // Reset temp value and preset when closing
+      // Reset temp value, preset and selection state when closing
       if (!newOpen) {
         setTempValue(value);
         setSelectedPreset(null);
+        setIsSelectingStart(true);
       }
     }, [onOpenChange, value]);
 
@@ -470,17 +475,24 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
       if (mode === 'single') {
         setTempValue(date);
       } else if (mode === 'range') {
-        if (!tempValue || typeof tempValue !== 'object' || !('start' in tempValue)) {
+        if (isSelectingStart) {
+          // First click: set start date and prepare for end date selection
           setTempValue({ start: date, end: date });
+          setIsSelectingStart(false);
         } else {
-          const { start } = tempValue;
-          if (!start || isSameDay(date, start)) {
-            setTempValue({ start: date, end: date });
-          } else if (date < start) {
+          // Second click: set end date
+          const currentRange = tempValue as { start: Date; end: Date };
+          const start = currentRange.start;
+          
+          if (date < start) {
+            // If user clicked a date before start, swap them
             setTempValue({ start: date, end: start });
           } else {
+            // Normal case: set end date
             setTempValue({ start, end: date });
           }
+          // Reset to selecting start for next range selection
+          setIsSelectingStart(true);
         }
       } else if (mode === 'multi') {
         const currentDates = Array.isArray(tempValue) ? tempValue : [];
@@ -495,7 +507,7 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
           setTempValue([...currentDates, date]);
         }
       }
-    }, [mode, tempValue, disabled]);
+    }, [mode, tempValue, disabled, isSelectingStart]);
 
     const handleSave = useCallback(() => {
       onChange?.(tempValue);
@@ -783,6 +795,8 @@ export const DateTimePicker = forwardRef<HTMLDivElement, DateTimePickerProps>(
       if (selectedDate) {
         setTempValue(selectedDate);
         setSelectedPreset(presetValue);
+        // Reset range selection state after preset is applied
+        setIsSelectingStart(true);
       }
 
       if (targetMonth) {

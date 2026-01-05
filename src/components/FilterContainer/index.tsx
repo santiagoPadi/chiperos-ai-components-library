@@ -233,8 +233,7 @@ export const FilterContainer: React.FC<FilterContainerProps> = ({
                                             filter.onChange?.(null);
                                         }
                                     }}
-                                    label={filter.label}
-                                    showLabel={filter.showLabel}
+                                    showLabel={false}
                                     placeholder={filter.placeholder || filter.label}
                                     showTimePresets={filter.showTimePresets ?? true}
                                     minDate={filter.minDate}
