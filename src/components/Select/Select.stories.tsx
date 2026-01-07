@@ -811,3 +811,262 @@ export const MultipleFilterExample: Story = {
   args: { options: [] },
 };
 
+// ==================== SEARCHABLE SELECT ====================
+
+export const WithSearch: Story = {
+  render: () => {
+    const [value, setValue] = useState('');
+    const [searchLog, setSearchLog] = useState<string[]>([]);
+
+    const handleSearch = (term: string) => {
+      const timestamp = new Date().toLocaleTimeString();
+      setSearchLog((prev) => [...prev, `[${timestamp}] Search: "${term}"`]);
+    };
+
+    return (
+      <div style={{ width: '350px' }}>
+        <div style={{ marginBottom: '16px' }}>
+          <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500 }}>
+            Country (searchable select)
+          </label>
+          <Select
+            search
+            options={countryOptions}
+            placeholder="Select a country"
+            searchPlaceholder="Type to search..."
+            value={value}
+            onChange={setValue}
+            onSearch={handleSearch}
+          />
+          <p style={{ marginTop: '8px', fontSize: '12px', color: '#888' }}>
+            💡 <strong>1st click</strong> opens the dropdown → <strong>then</strong> you can type to search.
+          </p>
+        </div>
+        
+        <div style={{ marginTop: '16px', padding: '12px', backgroundColor: '#f4f4f4', borderRadius: '4px' }}>
+          <p style={{ margin: '0 0 8px', fontSize: '14px' }}>
+            <strong>Selected:</strong> {value || 'None'}
+          </p>
+          <div>
+            <strong style={{ fontSize: '14px' }}>onSearch calls (2s debounce):</strong>
+            <div style={{ maxHeight: '100px', overflowY: 'auto', marginTop: '4px' }}>
+              {searchLog.length === 0 ? (
+                <p style={{ margin: 0, fontSize: '12px', color: '#666' }}>Type something and wait 2 seconds...</p>
+              ) : (
+                searchLog.map((log, i) => (
+                  <p key={i} style={{ margin: '2px 0', fontSize: '12px', color: '#666' }}>{log}</p>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  },
+  args: { options: [] },
+};
+
+export const MultipleWithSearch: Story = {
+  render: () => {
+    const [value, setValue] = useState<string[]>([]);
+    const [searchLog, setSearchLog] = useState<string[]>([]);
+
+    const handleSearch = (term: string) => {
+      const timestamp = new Date().toLocaleTimeString();
+      setSearchLog((prev) => [...prev, `[${timestamp}] "${term}"`]);
+    };
+
+    return (
+      <div style={{ width: '350px' }}>
+        <div style={{ marginBottom: '16px' }}>
+          <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500 }}>
+            Categories (multi-select with search)
+          </label>
+          <Select
+            multiple
+            search
+            options={categoryOptions}
+            placeholder="Select categories"
+            searchPlaceholder="Type to filter..."
+            value={value}
+            onChange={setValue}
+            onSearch={handleSearch}
+          />
+          <p style={{ marginTop: '8px', fontSize: '12px', color: '#888' }}>
+            💡 Click to open → then type to search. Select multiple with checkboxes.
+          </p>
+        </div>
+        
+        <div style={{ marginTop: '16px', padding: '12px', backgroundColor: '#f4f4f4', borderRadius: '4px' }}>
+          <p style={{ margin: '0 0 8px', fontSize: '14px' }}>
+            <strong>Selected:</strong> {value.length > 0 ? value.join(', ') : 'None'}
+          </p>
+          <div>
+            <strong style={{ fontSize: '14px' }}>onSearch calls:</strong>
+            <div style={{ maxHeight: '80px', overflowY: 'auto', marginTop: '4px' }}>
+              {searchLog.length === 0 ? (
+                <p style={{ margin: 0, fontSize: '12px', color: '#666' }}>Waiting for 2s debounce...</p>
+              ) : (
+                searchLog.map((log, i) => (
+                  <p key={i} style={{ margin: '2px 0', fontSize: '12px', color: '#666' }}>{log}</p>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  },
+  args: { options: [] },
+};
+
+export const SearchWithManyOptions: Story = {
+  render: () => {
+    const [value, setValue] = useState('');
+    
+    const manyOptions: SelectOption[] = Array.from({ length: 50 }, (_, i) => ({
+      id: `${i + 1}`,
+      text: `Option ${i + 1} - ${['Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon'][i % 5]}`,
+    }));
+
+    const handleSearch = (term: string) => {
+      console.log('Search term (after 2s debounce):', term);
+    };
+
+    return (
+      <div style={{ width: '350px' }}>
+        <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500 }}>
+          Search through 50 options
+        </label>
+        <Select
+          search
+          options={manyOptions}
+          placeholder="Type to filter options..."
+          value={value}
+          onChange={setValue}
+          onSearch={handleSearch}
+        />
+        <p style={{ marginTop: '8px', fontSize: '12px', color: '#666' }}>
+          Selected: {value || 'None'} (Check console for search callbacks)
+        </p>
+      </div>
+    );
+  },
+  args: { options: [] },
+};
+
+export const SearchWithAsyncSimulation: Story = {
+  render: () => {
+    const [value, setValue] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [options, setOptions] = useState<SelectOption[]>(countryOptions);
+
+    // Simulate async search - in real usage, this would call an API
+    const handleSearch = (term: string) => {
+      setLoading(true);
+      // Simulate API call
+      setTimeout(() => {
+        if (term) {
+          // Simulate filtering on server
+          const filtered = countryOptions.filter((opt) =>
+            opt.text.toLowerCase().includes(term.toLowerCase())
+          );
+          setOptions(filtered);
+        } else {
+          setOptions(countryOptions);
+        }
+        setLoading(false);
+      }, 500);
+    };
+
+    return (
+      <div style={{ width: '350px' }}>
+        <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500 }}>
+          Async Search Simulation
+        </label>
+        <Select
+          search
+          options={options}
+          placeholder="Type to search countries..."
+          value={value}
+          onChange={setValue}
+          onSearch={handleSearch}
+        />
+        <p style={{ marginTop: '8px', fontSize: '12px', color: '#666' }}>
+          {loading ? '⏳ Loading...' : `${options.length} options available`}
+        </p>
+        <p style={{ marginTop: '4px', fontSize: '12px', color: '#888' }}>
+          This simulates an async API call triggered after the 2s debounce.
+          The onSearch callback can be used to fetch filtered data from an API.
+        </p>
+      </div>
+    );
+  },
+  args: { options: [] },
+};
+
+export const SearchPrimaryVariant: Story = {
+  render: () => {
+    const [value, setValue] = useState('');
+
+    return (
+      <div style={{ width: '300px' }}>
+        <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500 }}>
+          Primary variant with search
+        </label>
+        <Select
+          search
+          variant="primary"
+          options={exportOptions}
+          placeholder="Search export format..."
+          value={value}
+          onChange={setValue}
+          onSearch={(term) => console.log('Search:', term)}
+        />
+      </div>
+    );
+  },
+  args: { options: [] },
+};
+
+export const SearchVsNormalComparison: Story = {
+  render: () => {
+    const [normalValue, setNormalValue] = useState('');
+    const [searchValue, setSearchValue] = useState('');
+
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', width: '350px' }}>
+        <div>
+          <h3 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Normal Select</h3>
+          <Select
+            options={countryOptions}
+            placeholder="Click to select"
+            value={normalValue}
+            onChange={setNormalValue}
+          />
+          <p style={{ marginTop: '4px', fontSize: '12px', color: '#888' }}>
+            Click → opens dropdown → click option to select
+          </p>
+        </div>
+
+        <div>
+          <h3 style={{ marginBottom: '8px', fontSize: '14px', fontWeight: 'bold' }}>Searchable Select</h3>
+          <Select
+            search
+            options={countryOptions}
+            placeholder="Select a country"
+            searchPlaceholder="Type to search..."
+            value={searchValue}
+            onChange={setSearchValue}
+            onSearch={(term) => console.log('Searching:', term)}
+          />
+          <p style={{ marginTop: '4px', fontSize: '12px', color: '#888' }}>
+            Click → opens dropdown → <strong>now you can type</strong> to search → onSearch fires after 2s debounce
+          </p>
+        </div>
+      </div>
+    );
+  },
+  args: { options: [] },
+};
+
