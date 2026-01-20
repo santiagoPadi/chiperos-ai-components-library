@@ -1,6 +1,17 @@
 import React, { useState } from 'react';
 import { cn } from '../../lib/utils';
 import { PaginationLib } from '../PaginationLib';
+import { Select, SelectOption } from '../Select';
+
+/**
+ * Default page size options
+ */
+const DEFAULT_PAGE_SIZE_OPTIONS: SelectOption[] = [
+  { id: '25', text: '25 results' },
+  { id: '50', text: '50 results' },
+  { id: '100', text: '100 results' },
+  { id: '200', text: '200 results' },
+];
 
 export interface TableColumn<T = any> {
   /**
@@ -36,14 +47,37 @@ export interface TableProps<T = any> {
   data: T[];
   
   /**
-   * Number of rows per page
+   * Number of rows per page (default: 10)
+   * @deprecated Use pageSize instead
    */
   rowsPerPage?: number;
+  
+  /**
+   * Number of rows per page (controlled)
+   * Takes priority over rowsPerPage if both are provided
+   */
+  pageSize?: number;
+  
+  /**
+   * Callback when page size changes
+   */
+  onPageSizeChange?: (pageSize: number) => void;
+  
+  /**
+   * Page size options for the select dropdown
+   * Default: [25, 50, 100, 200]
+   */
+  pageSizeOptions?: SelectOption[];
   
   /**
    * Show pagination (default: true)
    */
   showPagination?: boolean;
+  
+  /**
+   * Show page size selector (default: true when showPagination is true)
+   */
+  showPageSizeSelector?: boolean;
   
   /**
    * Custom className for the table container
@@ -74,24 +108,38 @@ export interface TableProps<T = any> {
    * Empty state message
    */
   emptyMessage?: string;
+  
+  /**
+   * Total number of items (for server-side pagination)
+   * If provided, pagination will use this instead of data.length
+   */
+  totalItems?: number;
 }
 
 export function Table<T = any>({
   columns,
   data,
   rowsPerPage = 10,
+  pageSize: controlledPageSize,
+  onPageSizeChange,
+  pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
   showPagination = true,
+  showPageSizeSelector = true,
   className,
   rowClassName,
   onPageChange,
   currentPage: controlledPage,
   loading = false,
   emptyMessage = 'No data available',
+  totalItems,
 }: TableProps<T>) {
   const [internalPage, setInternalPage] = useState(1);
+  const [internalPageSize, setInternalPageSize] = useState(rowsPerPage);
   
-  // Use controlled page if provided, otherwise use internal state
+  // Use controlled values if provided, otherwise use internal state
+  // pageSize takes priority over rowsPerPage
   const currentPage = controlledPage !== undefined ? controlledPage : internalPage;
+  const currentPageSize = controlledPageSize !== undefined ? controlledPageSize : internalPageSize;
   
   const handlePageChange = (page: number) => {
     if (controlledPage === undefined) {
@@ -100,11 +148,31 @@ export function Table<T = any>({
     onPageChange?.(page);
   };
   
+  const handlePageSizeChange = (value: string) => {
+    const newPageSize = parseInt(value, 10);
+    if (controlledPageSize === undefined) {
+      setInternalPageSize(newPageSize);
+    }
+    // Reset to first page when page size changes
+    if (controlledPage === undefined) {
+      setInternalPage(1);
+    }
+    onPageSizeChange?.(newPageSize);
+    onPageChange?.(1);
+  };
+  
   // Calculate pagination
-  const totalPages = Math.ceil(data.length / rowsPerPage);
-  const startIndex = (currentPage - 1) * rowsPerPage;
-  const endIndex = startIndex + rowsPerPage;
-  const paginatedData = data.slice(startIndex, endIndex);
+  const totalDataCount = totalItems !== undefined ? totalItems : data.length;
+  const totalPages = Math.ceil(totalDataCount / currentPageSize);
+  const startIndex = (currentPage - 1) * currentPageSize;
+  const endIndex = startIndex + currentPageSize;
+  const paginatedData = totalItems !== undefined ? data : data.slice(startIndex, endIndex);
+  
+  // Get display text for page size select
+  const getPageSizeDisplayText = () => {
+    const option = pageSizeOptions.find(opt => opt.id === String(currentPageSize));
+    return option ? option.text : `${currentPageSize} results`;
+  };
   
   // Render cell content
   const renderCell = (column: TableColumn<T>, row: T, rowIndex: number) => {
@@ -230,17 +298,36 @@ export function Table<T = any>({
         </div>
       </div>
       
-      {/* Pagination */}
-      {showPagination && totalPages > 1 && !loading && (
+      {/* Pagination Footer */}
+      {showPagination && !loading && (
         <div
-          className="flex justify-end"
-          data-testid="table-pagination"
+          className={cn(
+            'flex items-center',
+            showPageSizeSelector ? 'justify-between' : 'justify-end'
+          )}
+          data-testid="table-pagination-footer"
         >
-          <PaginationLib
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
+          {/* Page Size Select */}
+          {showPageSizeSelector && (
+            <div className="w-[140px]" data-testid="table-page-size-select">
+              <Select
+                options={pageSizeOptions}
+                value={String(currentPageSize)}
+                onChange={handlePageSizeChange}
+                placeholder={getPageSizeDisplayText()}
+                className="h-[46px]"
+              />
+            </div>
+          )}
+          
+          {/* Pagination - Always show when showPagination is true */}
+          <div data-testid="table-pagination">
+            <PaginationLib
+              currentPage={currentPage}
+              totalPages={Math.max(totalPages, 1)}
+              onPageChange={handlePageChange}
+            />
+          </div>
         </div>
       )}
     </div>

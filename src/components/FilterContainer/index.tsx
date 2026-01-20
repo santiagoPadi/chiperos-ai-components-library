@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { cn } from '../../lib/utils';
 import { Select, SelectOption } from '../Select';
 import { Button } from '../ButtonRadix';
-import { Download, ListRestart } from 'lucide-react';
+import { Download, ListRestart, Settings2 } from 'lucide-react';
 import { DateTimePicker } from '../DateTimePicker';
+import { AdvancedFiltersContent } from './AdvancedFiltersContent';
+import { AdvancedFiltersResult, FilterFieldOption, CustomFilterData } from './types';
 
 /**
  * Base filter properties shared by all filter types
@@ -152,6 +154,33 @@ export interface FilterContainerProps {
     onApply?: () => void;
 
     /**
+     * Content to render inside the settings modal
+     * If not provided, AdvancedFiltersContent will be used
+     */
+    settingsModalContent?: React.ReactNode;
+
+    /**
+     * Callback when Settings modal opens
+     */
+    onSettingsOpen?: () => void;
+
+    /**
+     * Callback when Settings modal closes
+     */
+    onSettingsClose?: () => void;
+
+    /**
+     * Callback when Advanced Filters are applied
+     * Receives the typed filters result
+     */
+    onAdvancedFiltersApply?: (result: AdvancedFiltersResult) => void;
+
+    /**
+     * Initial filters to load in the Advanced Filters modal
+     */
+    initialAdvancedFilters?: CustomFilterData[];
+
+    /**
      * Callback when Download button is clicked
      */
     onDownload?: () => void;
@@ -173,6 +202,11 @@ export interface FilterContainerProps {
     applyDisabled?: boolean;
 
     /**
+     * Disable Settings button
+     */
+    settingsDisabled?: boolean;
+
+    /**
      * Disable Download button
      */
     downloadDisabled?: boolean;
@@ -191,15 +225,87 @@ export interface FilterContainerProps {
 export const FilterContainer: React.FC<FilterContainerProps> = ({
     filters = [],
     onApply,
+    settingsModalContent,
+    onSettingsOpen,
+    onSettingsClose,
+    onAdvancedFiltersApply,
+    initialAdvancedFilters = [],
     onDownload,
     onRestart,
     applyLabel = 'Apply',
     applyDisabled = false,
+    settingsDisabled = false,
     downloadDisabled = false,
     restartDisabled = false,
     className,
 }) => {
+    const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+
+    /**
+     * Generate filter options for Advanced Filters from the existing filters
+     * Extracts key and label from each filter to create selectable options
+     */
+    const advancedFilterOptions: FilterFieldOption[] = useMemo(() => {
+        return filters.map((filter) => ({
+            id: filter.key,
+            text: filter.label,
+        }));
+    }, [filters]);
+
+    const handleOpenSettingsModal = () => {
+        setIsSettingsModalOpen(true);
+        onSettingsOpen?.();
+    };
+
+    const handleCloseSettingsModal = () => {
+        setIsSettingsModalOpen(false);
+        onSettingsClose?.();
+    };
+
+    /**
+     * Handle advanced filters apply
+     * Passes the result to the callback if provided
+     */
+    const handleAdvancedFiltersApply = (result: AdvancedFiltersResult) => {
+        onAdvancedFiltersApply?.(result);
+    };
+
+    /**
+     * Determine the modal content to render
+     * Uses custom content if provided, otherwise uses AdvancedFiltersContent
+     */
+    const modalContent = settingsModalContent ?? (
+        <AdvancedFiltersContent
+            filterOptions={advancedFilterOptions}
+            onApply={handleAdvancedFiltersApply}
+            onClose={handleCloseSettingsModal}
+            initialFilters={initialAdvancedFilters}
+        />
+    );
+
     return (
+        <>
+        {/* Settings Modal */}
+        {isSettingsModalOpen && (
+            <div
+                className="fixed inset-0 z-50 flex items-center justify-center"
+                data-testid="filter-container-settings-modal-overlay"
+            >
+                {/* Dark blur overlay - clickable to close */}
+                <div 
+                    className="absolute inset-0 bg-black/50 backdrop-blur-sm cursor-pointer"
+                    onClick={handleCloseSettingsModal}
+                />
+                
+                {/* Modal content container */}
+                <div
+                    className="relative bg-white rounded-[12px] p-8 w-[80vw] max-h-[90vh] overflow-auto shadow-xl"
+                    data-testid="filter-container-settings-modal"
+                >
+                    {modalContent}
+                </div>
+            </div>
+        )}
         <div
             className={cn(
                 'bg-white rounded-xl p-6 px-14',
@@ -289,14 +395,28 @@ export const FilterContainer: React.FC<FilterContainerProps> = ({
                 className="flex items-center justify-end gap-3 w-[30%] flex-shrink-0"
                 data-testid="filter-container-actions"
             >
+                {/* Settings Button */}
+                <Button
+                    variant="plain"
+                    size="large"
+                    iconOnly
+                    leftIcon={<Settings2 size={20} className="cursor-pointer" />}
+                    onClick={handleOpenSettingsModal}
+                    disabled={settingsDisabled}
+                    className="cursor-pointer"
+                    data-testid="filter-container-settings-btn"
+                    aria-label="Settings"
+                />
+
                 {/* Download Button */}
                 <Button
                     variant="plain"
                     size="large"
                     iconOnly
-                    leftIcon={<Download size={20} />}
+                    leftIcon={<Download size={20} className="cursor-pointer" />}
                     onClick={onDownload}
                     disabled={downloadDisabled}
+                    className="cursor-pointer"
                     data-testid="filter-container-download-btn"
                     aria-label="Download"
                 />
@@ -306,9 +426,10 @@ export const FilterContainer: React.FC<FilterContainerProps> = ({
                     variant="plain"
                     size="large"
                     iconOnly
-                    leftIcon={<ListRestart size={20} />}
+                    leftIcon={<ListRestart size={20} className="cursor-pointer" />}
                     onClick={onRestart}
                     disabled={restartDisabled}
+                    className="cursor-pointer"
                     data-testid="filter-container-restart-btn"
                     aria-label="Restart"
                 />
@@ -318,14 +439,31 @@ export const FilterContainer: React.FC<FilterContainerProps> = ({
                     size="large"
                     onClick={onApply}
                     disabled={applyDisabled}
+                    className="cursor-pointer"
                     data-testid="filter-container-apply-btn"
                 >
                     {applyLabel}
                 </Button>
             </div>
         </div>
+        </>
     );
 };
 
 export default FilterContainer;
 
+// Export types for consumers
+export type {
+    AdvancedFiltersResult,
+    CustomFilterData,
+    FilterFieldOption,
+    ConditionType,
+    FilterOperator,
+} from './types';
+
+// Export components
+export { AdvancedFiltersContent } from './AdvancedFiltersContent';
+export { CustomFilter } from './CustomFilter';
+
+// Export hooks
+export { useCustomFilters, useDragAndDrop, useTagInput } from './hooks';

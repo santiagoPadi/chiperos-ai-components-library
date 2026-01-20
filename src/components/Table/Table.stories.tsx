@@ -76,14 +76,15 @@ export const Default: Story = {
 export const WithPagination: Story = {
   args: {
     columns: basicColumns,
-    data: Array.from({ length: 25 }, (_, i) => ({
+    data: Array.from({ length: 150 }, (_, i) => ({
       id: i + 1,
       name: `User ${i + 1}`,
       email: `user${i + 1}@example.com`,
       role: i % 3 === 0 ? 'Admin' : i % 3 === 1 ? 'Editor' : 'User',
       status: i % 2 === 0 ? 'Active' : 'Inactive',
     })),
-    rowsPerPage: 10,
+    rowsPerPage: 25,
+    showPageSizeSelector: true,
     showPagination: true,
   },
 };
@@ -91,7 +92,7 @@ export const WithPagination: Story = {
 export const CustomRowsPerPage: Story = {
   args: {
     columns: basicColumns,
-    data: Array.from({ length: 25 }, (_, i) => ({
+    data: Array.from({ length: 150 }, (_, i) => ({
       id: i + 1,
       name: `User ${i + 1}`,
       email: `user${i + 1}@example.com`,

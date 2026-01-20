@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '../../lib/utils';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface PaginationLibProps {
   currentPage: number;
@@ -83,7 +84,7 @@ export const PaginationLib: React.FC<PaginationLibProps> = ({
             : 'border-[#ecebf0] cursor-pointer hover:bg-gray-50'
         )}
       >
-        <i className="tabler-chevron-left text-sm text-[#312e4d]" />
+        <ChevronLeft size={14} className="text-[#312e4d]" />
       </button>
       
       {pageNumbers.map((page, index) => {
@@ -136,7 +137,7 @@ export const PaginationLib: React.FC<PaginationLibProps> = ({
             : 'border-[#ecebf0] cursor-pointer hover:bg-gray-50'
         )}
       >
-        <i className="tabler-chevron-right text-sm text-[#312e4d]" />
+        <ChevronRight size={14} className="text-[#312e4d]" />
       </button>
     </div>
   );

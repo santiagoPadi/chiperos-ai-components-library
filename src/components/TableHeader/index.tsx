@@ -288,7 +288,8 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                         'border border-[#ecebf0] rounded',
                         'px-4 py-3 h-11',
                         'text-base leading-5 text-[#312e4d]',
-                        'hover:border-[#a29fba] transition-colors'
+                        'hover:border-[#a29fba] transition-colors',
+                        'cursor-pointer'
                       )}
                       onClick={() => filter.onChange?.('')}
                     >
