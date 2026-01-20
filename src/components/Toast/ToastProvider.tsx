@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { createContext, useContext, ReactNode } from 'react';
-import { useToast, UseToastReturn, ShowToastOptions } from './useToast';
+import { useToast, UseToastReturn } from './useToast';
 import { ToastContainer } from './ToastContainer';
 
 /**
