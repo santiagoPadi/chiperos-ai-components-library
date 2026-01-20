@@ -220,11 +220,9 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
         </div>
       )}
       
-      {/* Search Field and Buttons Row */}
-      <div className="flex gap-4 items-center w-full">
-      {/* Search Field */}
+      {/* Search Field Row */}
       <div
-          className="relative flex-1"
+        className="relative w-full"
         data-testid="table-header-search"
       >
         <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">
@@ -247,100 +245,110 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
         />
       </div>
       
-        {/* Buttons */}
-        {showButtons && buttons.length > 0 && (
-          <div
-            className="flex gap-4 items-center shrink-0"
-            data-testid="table-header-buttons"
-          >
-            {buttons.map((button, index) => (
-              <div
-                key={index}
-                data-testid={`table-header-button-${index}`}
-              >
-                {button.isDropdown && button.dropdownOptions ? (
-                  /* Dropdown Button */
-                  <div className="relative">
+      {/* Filters and Buttons Row */}
+      {((showFilters && filters.length > 0) || (showButtons && buttons.length > 0)) && (
+        <div
+          className="flex gap-4 items-center"
+          data-testid="table-header-filters-buttons-row"
+        >
+          {/* Filters Section */}
+          {showFilters && filters.length > 0 && (
+            <div
+              className="flex gap-4 items-center"
+              data-testid="table-header-filters"
+            >
+              {/* "Filter by" label */}
+              <div className="flex items-center gap-2 py-3">
+                <ListFilter size={16} className="text-[#312e4d]" />
+                <span className="text-base leading-5 text-[#312e4d]">
+                  Filter by
+                </span>
+              </div>
+              
+              {/* Filter dropdowns */}
+              {filters.map((filter, index) => (
+                <div
+                  key={filter.key}
+                  className="min-w-[120px]"
+                  data-testid={`table-header-filter-${index}`}
+                >
+                  {filter.options && filter.options.length > 0 ? (
                     <Select
-                      variant={button.variant === 'primary' ? 'primary' : 'default'}
-                      options={button.dropdownOptions}
-                      value={button.dropdownValue}
-                      onChange={(value) => button.onDropdownChange?.(value)}
-                      placeholder={button.label}
-                      label={button.dropdownLabel}
-                      className={cn(
-                        'h-11',
-                        button.variant === 'outline'
-                          ? 'border-[#00b56b]'
-                          : ''
-                      )}
+                      options={filter.options}
+                      value={filter.value}
+                      onChange={(value) => filter.onChange?.(value)}
+                      placeholder={filter.placeholder || filter.label}
+                      label={filter.label}
+                      className="h-11"
                     />
-                  </div>
-                ) : (
-                  /* Regular Button */
-                  <Button
-                    variant={button.variant === 'outline' ? 'secondary' : 'primary'}
-                    onClick={button.onClick}
-                    className="h-11 font-medium"
-                  >
-                    {button.label}
-                  </Button>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-      
-      {/* Filters Row */}
-        {showFilters && filters.length > 0 && (
-          <div
-            className="flex gap-4 items-center"
-            data-testid="table-header-filters"
-          >
-            {/* "Filter by" label */}
-            <div className="flex items-center gap-2 py-3">
-              <ListFilter size={16} className="text-[#312e4d]" />
-              <span className="text-base leading-5 text-[#312e4d]">
-                Filter by
-              </span>
+                  ) : (
+                    <button
+                      className={cn(
+                        'flex items-center gap-2',
+                        'border border-[#ecebf0] rounded',
+                        'px-4 py-3 h-11',
+                        'text-base leading-5 text-[#312e4d]',
+                        'hover:border-[#a29fba] transition-colors'
+                      )}
+                      onClick={() => filter.onChange?.('')}
+                    >
+                      <span>{filter.placeholder || filter.label}</span>
+                      <ChevronDown size={16} />
+                    </button>
+                  )}
+                </div>
+              ))}
             </div>
-            
-            {/* Filter dropdowns */}
-            {filters.map((filter, index) => (
-              <div
-                key={filter.key}
-                className="min-w-[120px]"
-                data-testid={`table-header-filter-${index}`}
-              >
-                {filter.options && filter.options.length > 0 ? (
-                  <Select
-                    options={filter.options}
-                    value={filter.value}
-                    onChange={(value) => filter.onChange?.(value)}
-                    placeholder={filter.placeholder || filter.label}
-                    label={filter.label}
-                    className="h-11"
-                  />
-                ) : (
-                  <button
-                    className={cn(
-                      'flex items-center gap-2',
-                      'border border-[#ecebf0] rounded',
-                      'px-4 py-3 h-11',
-                      'text-base leading-5 text-[#312e4d]',
-                      'hover:border-[#a29fba] transition-colors'
-                    )}
-                    onClick={() => filter.onChange?.('')}
-                  >
-                    <span>{filter.placeholder || filter.label}</span>
-                    <ChevronDown size={16} />
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+          )}
+          
+          {/* Spacer to push buttons to the right */}
+          <div className="flex-1" />
+          
+          {/* Buttons */}
+          {showButtons && buttons.length > 0 && (
+            <div
+              className="flex gap-4 items-center shrink-0"
+              data-testid="table-header-buttons"
+            >
+              {buttons.map((button, index) => (
+                <div
+                  key={index}
+                  data-testid={`table-header-button-${index}`}
+                >
+                  {button.isDropdown && button.dropdownOptions ? (
+                    /* Dropdown Button */
+                    <div className="relative">
+                      <Select
+                        variant={button.variant === 'primary' ? 'primary' : 'default'}
+                        options={button.dropdownOptions}
+                        value={button.dropdownValue}
+                        onChange={(value) => button.onDropdownChange?.(value)}
+                        placeholder={button.label}
+                        label={button.dropdownLabel}
+                        className={cn(
+                          'h-11',
+                          button.variant === 'outline'
+                            ? 'border-[#00b56b]'
+                            : ''
+                        )}
+                      />
+                    </div>
+                  ) : (
+                    /* Regular Button */
+                    <Button
+                      variant={button.variant === 'outline' ? 'secondary' : 'primary'}
+                      onClick={button.onClick}
+                      className="h-11 font-medium"
+                    >
+                      {button.label}
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
