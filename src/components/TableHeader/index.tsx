@@ -3,6 +3,14 @@ import { cn } from '../../lib/utils';
 import { Select, SelectOption } from '../Select';
 import { Button } from '../ButtonRadix';
 import { ListFilter, Search, ChevronDown } from 'lucide-react';
+import { DateTimePicker, DateTimePickerMode, SelectedDates } from '../DateTimePicker';
+
+/**
+ * Filter type for TableHeader
+ * - 'select': Dropdown filter using Select component
+ * - 'date': Date picker filter using DateTimePicker component
+ */
+export type TableHeaderFilterType = 'select' | 'date';
 
 export interface TableHeaderFilter {
   /**
@@ -16,24 +24,66 @@ export interface TableHeaderFilter {
   label: string;
   
   /**
+   * Type of filter: 'select' for dropdown, 'date' for date picker
+   * @default 'select'
+   */
+  type?: TableHeaderFilterType;
+  
+  /**
    * Placeholder text shown when no option is selected
    */
   placeholder?: string;
   
+  // ===== SELECT FILTER PROPS =====
+  
   /**
-   * Options for dropdown filter
+   * Options for dropdown filter (only for type='select')
    */
   options?: SelectOption[];
   
   /**
-   * Selected value
+   * Selected value (only for type='select')
    */
   value?: string;
   
   /**
-   * Callback when filter changes
+   * Callback when filter changes (only for type='select')
    */
   onChange?: (value: string) => void;
+  
+  // ===== DATE FILTER PROPS =====
+  
+  /**
+   * Date picker mode: 'single', 'range', or 'multi' (only for type='date')
+   * @default 'single'
+   */
+  dateMode?: DateTimePickerMode;
+  
+  /**
+   * Selected date value (only for type='date')
+   */
+  dateValue?: SelectedDates;
+  
+  /**
+   * Callback when date changes (only for type='date')
+   */
+  onDateChange?: (dates: SelectedDates) => void;
+  
+  /**
+   * Whether to show time presets in date picker (only for type='date')
+   * @default false
+   */
+  showTimePresets?: boolean;
+  
+  /**
+   * Minimum selectable date (only for type='date')
+   */
+  minDate?: Date;
+  
+  /**
+   * Maximum selectable date (only for type='date')
+   */
+  maxDate?: Date;
 }
 
 export interface TableHeaderButton {
@@ -265,40 +315,64 @@ export const TableHeader: React.FC<TableHeaderProps> = ({
                 </span>
               </div>
               
-              {/* Filter dropdowns */}
-              {filters.map((filter, index) => (
-                <div
-                  key={filter.key}
-                  className="min-w-[120px]"
-                  data-testid={`table-header-filter-${index}`}
-                >
-                  {filter.options && filter.options.length > 0 ? (
-                    <Select
-                      options={filter.options}
-                      value={filter.value}
-                      onChange={(value) => filter.onChange?.(value)}
-                      placeholder={filter.placeholder || filter.label}
-                      label={filter.label}
-                      className="h-11"
-                    />
-                  ) : (
-                    <button
-                      className={cn(
-                        'flex items-center gap-2',
-                        'border border-[#ecebf0] rounded',
-                        'px-4 py-3 h-11',
-                        'text-base leading-5 text-[#312e4d]',
-                        'hover:border-[#a29fba] transition-colors',
-                        'cursor-pointer'
-                      )}
-                      onClick={() => filter.onChange?.('')}
-                    >
-                      <span>{filter.placeholder || filter.label}</span>
-                      <ChevronDown size={16} />
-                    </button>
-                  )}
-                </div>
-              ))}
+              {/* Filter dropdowns and date pickers */}
+              {filters.map((filter, index) => {
+                const filterType = filter.type || 'select';
+                
+                return (
+                  <div
+                    key={filter.key}
+                    className="min-w-[120px]"
+                    data-testid={`table-header-filter-${index}`}
+                  >
+                    {/* Date Filter using DateTimePicker */}
+                    {filterType === 'date' && (
+                      <DateTimePicker
+                        value={filter.dateValue}
+                        onChange={(dates) => filter.onDateChange?.(dates)}
+                        mode={filter.dateMode || 'single'}
+                        label={filter.label}
+                        showLabel={false}
+                        placeholder={filter.placeholder || filter.label}
+                        showTimePresets={filter.showTimePresets}
+                        minDate={filter.minDate}
+                        maxDate={filter.maxDate}
+                        className="min-w-[160px]"
+                      />
+                    )}
+                    
+                    {/* Select Filter using Select component */}
+                    {filterType === 'select' && filter.options && filter.options.length > 0 && (
+                      <Select
+                        options={filter.options}
+                        value={filter.value}
+                        onChange={(value) => filter.onChange?.(value)}
+                        placeholder={filter.placeholder || filter.label}
+                        label={filter.label}
+                        className="h-11"
+                      />
+                    )}
+                    
+                    {/* Fallback button for select without options */}
+                    {filterType === 'select' && (!filter.options || filter.options.length === 0) && (
+                      <button
+                        className={cn(
+                          'flex items-center gap-2',
+                          'border border-[#ecebf0] rounded',
+                          'px-4 py-3 h-11',
+                          'text-base leading-5 text-[#312e4d]',
+                          'hover:border-[#a29fba] transition-colors',
+                          'cursor-pointer'
+                        )}
+                        onClick={() => filter.onChange?.('')}
+                      >
+                        <span>{filter.placeholder || filter.label}</span>
+                        <ChevronDown size={16} />
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
           

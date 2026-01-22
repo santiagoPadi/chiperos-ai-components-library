@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { TableHeader, TableHeaderFilter, TableHeaderButton, TableHeaderCard } from './index';
 import { useState } from 'react';
 import { UserRoundCheck, UserRoundX, UsersRound } from 'lucide-react';
+import { SelectedDates } from '../DateTimePicker';
 
 const meta = {
   title: 'Components/TableHeader',
@@ -476,3 +477,303 @@ export const WithPrimaryDropdown: Story = {
   args: {},
 };
 
+/**
+ * TableHeader with DateTimePicker Filter
+ * 
+ * Demonstrates how to use the DateTimePicker as a filter in TableHeader.
+ * The date filter supports:
+ * - Single date selection
+ * - Date range selection
+ * - Time presets (Today, Tomorrow, This Week, This Month)
+ */
+export const WithDateFilter: Story = {
+  render: () => {
+    const [selectedDate, setSelectedDate] = useState<SelectedDates>(null);
+    const [statusFilter, setStatusFilter] = useState('');
+    const [searchValue, setSearchValue] = useState('');
+
+    const filterConfigs: TableHeaderFilter[] = [
+      {
+        key: 'status',
+        label: 'Status',
+        type: 'select',
+        placeholder: 'Status',
+        options: [
+          { id: 'active', text: 'Active' },
+          { id: 'inactive', text: 'Inactive' },
+          { id: 'pending', text: 'Pending' },
+        ],
+        value: statusFilter,
+        onChange: setStatusFilter,
+      },
+      {
+        key: 'createdAt',
+        label: 'Created Date',
+        type: 'date',
+        placeholder: 'Select date',
+        dateMode: 'single',
+        dateValue: selectedDate,
+        onDateChange: setSelectedDate,
+      },
+    ];
+
+    // Format date for display
+    const formatDateDisplay = (date: SelectedDates): string => {
+      if (!date) return 'None';
+      if (date instanceof Date) {
+        return date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+        });
+      }
+      if ('start' in date && 'end' in date) {
+        const start = date.start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const end = date.end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        return `${start} - ${end}`;
+      }
+      return 'None';
+    };
+
+    return (
+      <div>
+        <TableHeader
+          searchPlaceholder="Search orders..."
+          searchValue={searchValue}
+          onSearchChange={setSearchValue}
+          filters={filterConfigs}
+          showFilters
+        />
+        
+        <div style={{ marginTop: '16px', padding: '12px', backgroundColor: '#f4f4f4', borderRadius: '4px' }}>
+          <strong>Current Filters:</strong>
+          <pre style={{ marginTop: '8px', fontSize: '12px' }}>
+            {JSON.stringify({
+              search: searchValue,
+              status: statusFilter || 'All',
+              date: formatDateDisplay(selectedDate),
+            }, null, 2)}
+          </pre>
+        </div>
+      </div>
+    );
+  },
+  args: {},
+};
+
+/**
+ * TableHeader with Date Range Filter
+ * 
+ * Shows how to use the DateTimePicker in range mode for filtering by date ranges.
+ * Includes time presets for quick selection.
+ */
+export const WithDateRangeFilter: Story = {
+  render: () => {
+    const [dateRange, setDateRange] = useState<SelectedDates>(null);
+    const [categoryFilter, setCategoryFilter] = useState('');
+    const [searchValue, setSearchValue] = useState('');
+
+    const filterConfigs: TableHeaderFilter[] = [
+      {
+        key: 'category',
+        label: 'Category',
+        type: 'select',
+        placeholder: 'Category',
+        options: [
+          { id: 'orders', text: 'Orders' },
+          { id: 'shipments', text: 'Shipments' },
+          { id: 'returns', text: 'Returns' },
+        ],
+        value: categoryFilter,
+        onChange: setCategoryFilter,
+      },
+      {
+        key: 'dateRange',
+        label: 'Date Range',
+        type: 'date',
+        placeholder: 'Select range',
+        dateMode: 'range',
+        dateValue: dateRange,
+        onDateChange: setDateRange,
+        showTimePresets: true,
+      },
+    ];
+
+    const buttons: TableHeaderButton[] = [
+      {
+        label: 'Export Report',
+        variant: 'primary',
+        onClick: () => alert('Exporting report...'),
+      },
+    ];
+
+    // Format date range for display
+    const formatDateRange = (dates: SelectedDates): string => {
+      if (!dates) return 'All time';
+      if (dates instanceof Date) {
+        return dates.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+        });
+      }
+      if ('start' in dates && 'end' in dates) {
+        const start = dates.start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const end = dates.end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        return `${start} - ${end}`;
+      }
+      return 'All time';
+    };
+
+    return (
+      <div>
+        <TableHeader
+          title="Orders Report"
+          showTitle
+          searchPlaceholder="Search orders by ID..."
+          searchValue={searchValue}
+          onSearchChange={setSearchValue}
+          filters={filterConfigs}
+          showFilters
+          buttons={buttons}
+          showButtons
+        />
+        
+        <div style={{ marginTop: '16px', padding: '12px', backgroundColor: '#f4f4f4', borderRadius: '4px' }}>
+          <strong>Applied Filters:</strong>
+          <pre style={{ marginTop: '8px', fontSize: '12px' }}>
+            {JSON.stringify({
+              search: searchValue || '(empty)',
+              category: categoryFilter || 'All',
+              dateRange: formatDateRange(dateRange),
+            }, null, 2)}
+          </pre>
+        </div>
+      </div>
+    );
+  },
+  args: {},
+};
+
+/**
+ * Complete TableHeader with Multiple Date Filters
+ * 
+ * A comprehensive example showing multiple date filters along with
+ * select filters, cards, and action buttons.
+ */
+export const CompleteWithDateFilters: Story = {
+  render: () => {
+    const [searchValue, setSearchValue] = useState('');
+    const [statusFilter, setStatusFilter] = useState('');
+    const [createdDate, setCreatedDate] = useState<SelectedDates>(null);
+    const [deliveryDateRange, setDeliveryDateRange] = useState<SelectedDates>(null);
+
+    const filterConfigs: TableHeaderFilter[] = [
+      {
+        key: 'status',
+        label: 'Status',
+        type: 'select',
+        placeholder: 'Status',
+        options: [
+          { id: 'received', text: 'Received' },
+          { id: 'processing', text: 'Processing' },
+          { id: 'shipped', text: 'Shipped' },
+          { id: 'delivered', text: 'Delivered' },
+        ],
+        value: statusFilter,
+        onChange: setStatusFilter,
+      },
+      {
+        key: 'createdAt',
+        label: 'Order Date',
+        type: 'date',
+        placeholder: 'Order date',
+        dateMode: 'single',
+        dateValue: createdDate,
+        onDateChange: setCreatedDate,
+      },
+      {
+        key: 'deliveryDate',
+        label: 'Delivery Window',
+        type: 'date',
+        placeholder: 'Delivery window',
+        dateMode: 'range',
+        dateValue: deliveryDateRange,
+        onDateChange: setDeliveryDateRange,
+        showTimePresets: true,
+      },
+    ];
+
+    const buttons: TableHeaderButton[] = [
+      {
+        label: 'Bulk Actions',
+        variant: 'outline',
+        isDropdown: true,
+        dropdownOptions: [
+          { id: 'mark-shipped', text: 'Mark as Shipped' },
+          { id: 'mark-delivered', text: 'Mark as Delivered' },
+          { id: 'cancel', text: 'Cancel Orders' },
+        ],
+        onDropdownChange: (value) => alert(`Action: ${value}`),
+      },
+      {
+        label: 'New Order',
+        variant: 'primary',
+        onClick: () => alert('Creating new order...'),
+      },
+    ];
+
+    const cards = [
+      {
+        label: 'Processing',
+        value: 24,
+        icon: <UserRoundCheck size={24} color="#00995a" />,
+      },
+      {
+        label: 'Shipped',
+        value: 156,
+        icon: <UsersRound size={24} color="#00995a" />,
+      },
+      {
+        label: 'Delivered',
+        value: 1203,
+        icon: <UserRoundX size={24} color="#00995a" />,
+      },
+    ];
+
+    return (
+      <div>
+        <TableHeader
+          title="Orders Management"
+          showTitle
+          searchPlaceholder="Search by order ID, customer..."
+          searchValue={searchValue}
+          onSearchChange={setSearchValue}
+          filters={filterConfigs}
+          showFilters
+          buttons={buttons}
+          showButtons
+          cards={cards}
+          showCards
+        />
+        
+        <div style={{ marginTop: '16px', padding: '12px', backgroundColor: '#f4f4f4', borderRadius: '4px' }}>
+          <strong>Current State:</strong>
+          <pre style={{ marginTop: '8px', fontSize: '12px' }}>
+            {JSON.stringify({
+              search: searchValue,
+              status: statusFilter || 'All',
+              orderDate: createdDate instanceof Date 
+                ? createdDate.toLocaleDateString() 
+                : 'Not selected',
+              deliveryWindow: deliveryDateRange && 'start' in deliveryDateRange
+                ? `${deliveryDateRange.start.toLocaleDateString()} - ${deliveryDateRange.end.toLocaleDateString()}`
+                : 'Not selected',
+            }, null, 2)}
+          </pre>
+        </div>
+      </div>
+    );
+  },
+  args: {},
+};
