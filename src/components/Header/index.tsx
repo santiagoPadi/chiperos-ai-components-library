@@ -3,16 +3,57 @@ import { Search } from 'lucide-react'
 import LanguageSwitcher from '../LanguageSwitcher'
 import { AppRouterInstance } from '@/types'
 
-interface HeaderLibProps {
+export interface HeaderLibProps {
+    /**
+     * Text for the go-back button. If omitted, no back button is shown.
+     */
     goBackText?: string
+
+    /**
+     * URL to navigate to when the back button is clicked
+     */
     goBackHref?: string
+
+    /**
+     * Custom callback for the back button (overrides goBackHref and router.back)
+     */
     onBack?: () => void
+
+    /**
+     * Main title of the header
+     */
     title: string
+
+    /**
+     * Description text below the title
+     */
     description?: string
+
+    /**
+     * Additional content rendered in the header
+     */
     children?: React.ReactNode
+
+    /**
+     * Custom callback when search icon is clicked
+     */
     onSearch?: () => void
+
+    /**
+     * Whether to show the search icon button
+     * @default true
+     */
     showSearch?: boolean
+
+    /**
+     * Whether to show the language switcher
+     * @default true
+     */
     showLanguageSwitcher?: boolean
+
+    /**
+     * Hook that returns an AppRouterInstance (e.g., Next.js useRouter)
+     */
     useRouter: () => AppRouterInstance
 }
 

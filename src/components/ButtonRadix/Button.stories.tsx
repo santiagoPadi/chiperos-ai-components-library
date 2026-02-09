@@ -13,24 +13,79 @@ const meta = {
     variant: {
       control: 'select',
       options: ['primary', 'secondary', 'alert', 'ghost', 'plain'],
-      description: 'El estilo visual del botón',
+      description: 'Visual style variant of the button',
+      table: {
+        type: { summary: "'primary' | 'secondary' | 'alert' | 'ghost' | 'plain'" },
+        defaultValue: { summary: "'primary'" },
+      },
     },
     size: {
       control: 'select',
       options: ['small', 'medium', 'large'],
-      description: 'El tamaño del botón',
+      description: 'Size of the button',
+      table: {
+        type: { summary: "'small' | 'medium' | 'large'" },
+        defaultValue: { summary: "'medium'" },
+      },
     },
     iconOnly: {
       control: 'boolean',
-      description: 'Si el botón solo contiene un icono',
+      description: 'Whether the button contains only an icon (renders as square)',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
     },
     disabled: {
       control: 'boolean',
-      description: 'Deshabilitar el botón',
+      description: 'Whether the button is disabled',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
     },
     asChild: {
       control: 'boolean',
-      description: 'Usar como componente hijo (Radix Slot)',
+      description: 'Render as a child component using Radix Slot',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    leftIcon: {
+      control: false,
+      description: 'Icon element rendered before the button text',
+      table: {
+        type: { summary: 'ReactNode' },
+      },
+    },
+    rightIcon: {
+      control: false,
+      description: 'Icon element rendered after the button text',
+      table: {
+        type: { summary: 'ReactNode' },
+      },
+    },
+    children: {
+      control: 'text',
+      description: 'Button content / label',
+      table: {
+        type: { summary: 'ReactNode' },
+      },
+    },
+    className: {
+      control: 'text',
+      description: 'Additional CSS classes',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    onClick: {
+      action: 'clicked',
+      description: 'Click event handler',
+      table: {
+        type: { summary: '(e: MouseEvent) => void' },
+      },
     },
   },
 } satisfies Meta<typeof Button>;

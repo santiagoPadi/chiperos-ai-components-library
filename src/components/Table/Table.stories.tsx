@@ -21,27 +21,114 @@ const meta: Meta<TableProps<User>> = {
   argTypes: {
     columns: {
       control: 'object',
-      description: 'Array of column definitions',
+      description: 'Array of column definitions (key, label, render, className)',
+      table: {
+        type: { summary: 'TableColumn<T>[]' },
+      },
     },
     data: {
       control: 'object',
       description: 'Array of data rows',
+      table: {
+        type: { summary: 'T[]' },
+      },
     },
     rowsPerPage: {
       control: 'number',
-      description: 'Number of rows per page',
+      description: 'Number of rows per page (deprecated, use pageSize)',
+      table: {
+        type: { summary: 'number' },
+        defaultValue: { summary: '10' },
+      },
+    },
+    pageSize: {
+      control: 'number',
+      description: 'Number of rows per page (controlled). Takes priority over rowsPerPage.',
+      table: {
+        type: { summary: 'number' },
+      },
+    },
+    onPageSizeChange: {
+      action: 'pageSizeChanged',
+      description: 'Callback when page size changes',
+      table: {
+        type: { summary: '(pageSize: number) => void' },
+      },
+    },
+    pageSizeOptions: {
+      control: 'object',
+      description: 'Page size options for the dropdown selector',
+      table: {
+        type: { summary: 'SelectOption[]' },
+        defaultValue: { summary: '[25, 50, 100, 200]' },
+      },
     },
     showPagination: {
       control: 'boolean',
-      description: 'Show pagination controls',
+      description: 'Whether to show pagination controls',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'true' },
+      },
+    },
+    showPageSizeSelector: {
+      control: 'boolean',
+      description: 'Whether to show the page size selector dropdown',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'true' },
+      },
+    },
+    currentPage: {
+      control: 'number',
+      description: 'Current page number (for controlled component)',
+      table: {
+        type: { summary: 'number' },
+      },
+    },
+    onPageChange: {
+      action: 'pageChanged',
+      description: 'Callback when page changes',
+      table: {
+        type: { summary: '(page: number) => void' },
+      },
+    },
+    totalItems: {
+      control: 'number',
+      description: 'Total number of items (for server-side pagination)',
+      table: {
+        type: { summary: 'number' },
+      },
     },
     loading: {
       control: 'boolean',
-      description: 'Loading state',
+      description: 'Whether the table is in loading state',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
     },
     emptyMessage: {
       control: 'text',
-      description: 'Message shown when no data',
+      description: 'Message shown when there is no data',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: "'No data available'" },
+      },
+    },
+    className: {
+      control: 'text',
+      description: 'Additional CSS classes for the table container',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    rowClassName: {
+      control: false,
+      description: 'Custom class name or function returning class name for rows',
+      table: {
+        type: { summary: 'string | ((row: T, rowIndex: number) => string)' },
+      },
     },
   },
 };

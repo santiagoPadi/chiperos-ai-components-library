@@ -11,20 +11,41 @@ const meta = {
   argTypes: {
     percentage: {
       control: 'number',
-      description: 'Porcentaje de cambio',
+      description: 'Percentage of change (can be positive or negative)',
+      table: {
+        type: { summary: 'number' },
+      },
     },
     trend: {
       control: 'select',
       options: ['positive', 'negative'],
-      description: 'Tendencia del KPI',
+      description: 'KPI trend direction (positive = green up arrow, negative = red down arrow)',
+      table: {
+        type: { summary: "'positive' | 'negative'" },
+      },
     },
     label: {
       control: 'text',
-      description: 'Texto descriptivo',
+      description: 'Descriptive text next to the percentage',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: "'KPI comparison'" },
+      },
     },
     showWarning: {
       control: 'boolean',
-      description: 'Mostrar ícono de advertencia',
+      description: 'Whether to show a warning icon',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    className: {
+      control: 'text',
+      description: 'Additional CSS classes',
+      table: {
+        type: { summary: 'string' },
+      },
     },
   },
 } satisfies Meta<typeof KPIComparison>;

@@ -269,6 +269,37 @@ describe('Select', () => {
     });
   });
 
+  describe('Error State', () => {
+    it('renders error message when error is a string', () => {
+      render(<Select options={mockOptions} error="This field is required" />);
+
+      const errorEl = screen.getByTestId('select-error');
+      expect(errorEl).toBeInTheDocument();
+      expect(errorEl).toHaveTextContent('This field is required');
+    });
+
+    it('renders error border when error is a boolean', () => {
+      render(<Select options={mockOptions} error={true} />);
+
+      const trigger = screen.getByTestId('select-trigger');
+      expect(trigger).toHaveClass('border-[#ff305f]');
+      expect(screen.queryByTestId('select-error')).not.toBeInTheDocument();
+    });
+
+    it('sets aria-invalid on trigger when error is truthy', () => {
+      render(<Select options={mockOptions} error="Error" />);
+
+      const trigger = screen.getByTestId('select-trigger');
+      expect(trigger).toHaveAttribute('aria-invalid', 'true');
+    });
+
+    it('does not render error when error is undefined', () => {
+      render(<Select options={mockOptions} />);
+
+      expect(screen.queryByTestId('select-error')).not.toBeInTheDocument();
+    });
+  });
+
   describe('Edge Cases', () => {
     it('handles value that does not exist in options', () => {
       render(<Select options={mockOptions} value="999" />);

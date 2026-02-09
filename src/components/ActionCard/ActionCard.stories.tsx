@@ -9,6 +9,50 @@ const meta = {
     layout: 'centered',
   },
   tags: ['autodocs'],
+  argTypes: {
+    title: {
+      control: 'text',
+      description: 'Title of the action card',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    description: {
+      control: 'text',
+      description: 'Description text below the title',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    icon: {
+      control: false,
+      description: 'Icon element rendered on the left side',
+      table: {
+        type: { summary: 'ReactNode' },
+      },
+    },
+    action: {
+      control: false,
+      description: 'Optional CTA button with label and onClick handler',
+      table: {
+        type: { summary: '{ label: string; onClick: () => void }' },
+      },
+    },
+    onClick: {
+      action: 'clicked',
+      description: 'Callback when the entire card is clicked',
+      table: {
+        type: { summary: '() => void' },
+      },
+    },
+    className: {
+      control: 'text',
+      description: 'Additional CSS classes',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+  },
 } satisfies Meta<typeof ActionCard>;
 
 export default meta;

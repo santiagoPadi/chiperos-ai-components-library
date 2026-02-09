@@ -9,6 +9,59 @@ const meta = {
     layout: 'centered',
   },
   tags: ['autodocs'],
+  argTypes: {
+    title: {
+      control: 'text',
+      description: 'Title / name of the option',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    description: {
+      control: 'text',
+      description: 'Description of the option',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    value: {
+      control: 'text',
+      description: 'Value associated with this option (useful for radio groups)',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    selected: {
+      control: 'boolean',
+      description: 'Whether the option is selected',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    onSelect: {
+      action: 'selected',
+      description: 'Callback when the option is selected, receives the value',
+      table: {
+        type: { summary: '(value: string) => void' },
+      },
+    },
+    disabled: {
+      control: 'boolean',
+      description: 'Whether the option is disabled',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    className: {
+      control: 'text',
+      description: 'Additional CSS classes',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+  },
 } satisfies Meta<typeof OptionCard>;
 
 export default meta;

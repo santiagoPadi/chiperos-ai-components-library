@@ -8,6 +8,133 @@ const meta: Meta<typeof ComposedChart> = {
         layout: 'padded',
     },
     tags: ['autodocs'],
+    argTypes: {
+        data: {
+            control: 'object',
+            description: 'Array of data objects to display',
+            table: {
+                type: { summary: 'Record<string, unknown>[]' },
+            },
+        },
+        series: {
+            control: 'object',
+            description: 'Configuration for each data series (type, dataKey, name, color, stackId, yAxisId)',
+            table: {
+                type: { summary: 'ComposedChartSeries[]' },
+            },
+        },
+        xAxisKey: {
+            control: 'text',
+            description: 'Key in the data objects for the X-axis values',
+            table: {
+                type: { summary: 'string' },
+            },
+        },
+        height: {
+            control: 'number',
+            description: 'Height of the chart in pixels',
+            table: {
+                type: { summary: 'number' },
+                defaultValue: { summary: '400' },
+            },
+        },
+        showGrid: {
+            control: 'boolean',
+            description: 'Whether to show grid lines',
+            table: {
+                type: { summary: 'boolean' },
+                defaultValue: { summary: 'true' },
+            },
+        },
+        showLegend: {
+            control: 'boolean',
+            description: 'Whether to show the legend',
+            table: {
+                type: { summary: 'boolean' },
+                defaultValue: { summary: 'true' },
+            },
+        },
+        showTooltip: {
+            control: 'boolean',
+            description: 'Whether to show tooltips on hover',
+            table: {
+                type: { summary: 'boolean' },
+                defaultValue: { summary: 'true' },
+            },
+        },
+        showRightYAxis: {
+            control: 'boolean',
+            description: 'Whether to show a secondary Y-axis on the right',
+            table: {
+                type: { summary: 'boolean' },
+                defaultValue: { summary: 'false' },
+            },
+        },
+        margin: {
+            control: 'object',
+            description: 'Custom margin for the chart',
+            table: {
+                type: { summary: '{ top?: number; right?: number; bottom?: number; left?: number }' },
+            },
+        },
+        barGap: {
+            control: 'number',
+            description: 'Gap between bars in pixels',
+            table: {
+                type: { summary: 'number' },
+                defaultValue: { summary: '4' },
+            },
+        },
+        barSize: {
+            control: 'number',
+            description: 'Bar size in pixels',
+            table: {
+                type: { summary: 'number' },
+            },
+        },
+        title: {
+            control: 'text',
+            description: 'Main title of the chart',
+            table: {
+                type: { summary: 'string' },
+            },
+        },
+        xAxisLabel: {
+            control: 'text',
+            description: 'Label for the X-axis',
+            table: {
+                type: { summary: 'string' },
+            },
+        },
+        yAxisLabel: {
+            control: 'text',
+            description: 'Label for the left Y-axis',
+            table: {
+                type: { summary: 'string' },
+            },
+        },
+        yAxisRightLabel: {
+            control: 'text',
+            description: 'Label for the right Y-axis (only when showRightYAxis is true)',
+            table: {
+                type: { summary: 'string' },
+            },
+        },
+        currencyFormat: {
+            control: 'object',
+            description: 'Currency format config for the left Y-axis',
+            table: {
+                type: { summary: 'CurrencyFormatConfig' },
+            },
+        },
+        currencyFormatRight: {
+            control: 'object',
+            description: 'Currency format config for the right Y-axis',
+            table: {
+                type: { summary: 'CurrencyFormatConfig' },
+            },
+        },
+    },
 };
 
 export default meta;

@@ -11,24 +11,97 @@ const meta = {
   argTypes: {
     title: {
       control: 'text',
-      description: 'Título de la card',
+      description: 'Title of the KPI card',
+      table: {
+        type: { summary: 'string' },
+      },
     },
     value: {
       control: 'text',
-      description: 'Valor principal',
+      description: 'Main value to display',
+      table: {
+        type: { summary: 'number | string' },
+      },
     },
     unit: {
       control: 'text',
-      description: 'Unidad del valor',
+      description: 'Unit of the value (%, x, etc.)',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: "'%'" },
+      },
+    },
+    total: {
+      control: 'number',
+      description: 'Total value to show as fraction (e.g., 3/17)',
+      table: {
+        type: { summary: 'number' },
+      },
     },
     description: {
       control: 'text',
-      description: 'Texto descriptivo',
+      description: 'Descriptive text below the value',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    comparison: {
+      control: 'object',
+      description: 'KPI comparison data (percentage, trend, label, showWarning)',
+      table: {
+        type: { summary: '{ percentage: number; trend: "positive" | "negative"; label?: string; showWarning?: boolean }' },
+      },
+    },
+    tag: {
+      control: 'object',
+      description: 'Optional tag with label and variant',
+      table: {
+        type: { summary: '{ label: string; variant?: "default" | "red" }' },
+      },
+    },
+    icon: {
+      control: false,
+      description: 'Custom icon element',
+      table: {
+        type: { summary: 'ReactNode' },
+      },
     },
     iconColor: {
       control: 'select',
       options: ['primary', 'error', 'brand'],
-      description: 'Color del ícono',
+      description: 'Color of the icon',
+      table: {
+        type: { summary: "'primary' | 'error' | 'brand'" },
+        defaultValue: { summary: "'primary'" },
+      },
+    },
+    bodyText: {
+      control: 'text',
+      description: 'Additional body text (for Text variant)',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    button: {
+      control: 'object',
+      description: 'Optional action button with label and onClick',
+      table: {
+        type: { summary: '{ label: string; onClick?: () => void }' },
+      },
+    },
+    onClick: {
+      action: 'clicked',
+      description: 'Callback when the card is clicked',
+      table: {
+        type: { summary: '() => void' },
+      },
+    },
+    className: {
+      control: 'text',
+      description: 'Additional CSS classes',
+      table: {
+        type: { summary: 'string' },
+      },
     },
   },
 } satisfies Meta<typeof KPICard>;

@@ -10,43 +10,207 @@ const meta = {
   },
   tags: ['autodocs'],
   argTypes: {
+    value: {
+      control: false,
+      description: 'Current selected date(s): Date (single), { start, end } (range), or Date[] (multi)',
+      table: {
+        type: { summary: 'Date | { start: Date; end: Date } | Date[] | null' },
+      },
+    },
+    onChange: {
+      action: 'changed',
+      description: 'Callback fired when date selection changes',
+      table: {
+        type: { summary: '(dates: SelectedDates) => void' },
+      },
+    },
     mode: {
       control: 'select',
       options: ['single', 'range', 'multi'],
       description: 'Selection mode: single date, date range, or multiple dates',
+      table: {
+        type: { summary: "'single' | 'range' | 'multi'" },
+        defaultValue: { summary: "'single'" },
+      },
     },
     calendarView: {
       control: 'select',
       options: ['single', 'multi'],
-      description: 'Calendar view type: single or multi calendar',
+      description: 'Calendar view type: single or multi (side by side)',
+      table: {
+        type: { summary: "'single' | 'multi'" },
+        defaultValue: { summary: "'single'" },
+      },
     },
     showTimePresets: {
       control: 'boolean',
-      description: 'Whether to show time presets',
+      description: 'Whether to show time preset options',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
     },
     showInput: {
       control: 'boolean',
-      description: 'Whether to show the input field',
+      description: 'Whether to show the trigger input field',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'true' },
+      },
+    },
+    label: {
+      control: 'text',
+      description: 'Input label text',
+      table: {
+        type: { summary: 'string' },
+      },
     },
     showLabel: {
       control: 'boolean',
       description: 'Whether to show the label',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'true' },
+      },
+    },
+    required: {
+      control: 'boolean',
+      description: 'Whether the label shows a required asterisk',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    placeholder: {
+      control: 'text',
+      description: 'Input placeholder text',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: "'Select'" },
+      },
+    },
+    formatValue: {
+      control: false,
+      description: 'Custom format function for displaying selected date(s) in input',
+      table: {
+        type: { summary: '(dates: SelectedDates) => string' },
+      },
+    },
+    holidays: {
+      control: false,
+      description: 'List of holidays to highlight on the calendar',
+      table: {
+        type: { summary: 'Holiday[]' },
+      },
+    },
+    eventDays: {
+      control: false,
+      description: 'List of event days (shows indicator dot)',
+      table: {
+        type: { summary: 'EventDay[]' },
+      },
+    },
+    minDate: {
+      control: false,
+      description: 'Minimum selectable date',
+      table: {
+        type: { summary: 'Date' },
+      },
+    },
+    maxDate: {
+      control: false,
+      description: 'Maximum selectable date',
+      table: {
+        type: { summary: 'Date' },
+      },
+    },
+    initialMonth: {
+      control: false,
+      description: 'Initial month to display (defaults to current month)',
+      table: {
+        type: { summary: 'Date' },
+      },
     },
     showActions: {
       control: 'boolean',
       description: 'Whether to show action buttons (Cancel/Save)',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'true' },
+      },
+    },
+    cancelLabel: {
+      control: 'text',
+      description: 'Cancel button label',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: "'Cancel'" },
+      },
+    },
+    saveLabel: {
+      control: 'text',
+      description: 'Save button label',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: "'Save'" },
+      },
+    },
+    onCancel: {
+      action: 'cancelled',
+      description: 'Callback fired when cancel is clicked',
+      table: {
+        type: { summary: '() => void' },
+      },
+    },
+    onSave: {
+      action: 'saved',
+      description: 'Callback fired when save is clicked',
+      table: {
+        type: { summary: '(dates: SelectedDates) => void' },
+      },
     },
     disabled: {
       control: 'boolean',
       description: 'Whether the picker is disabled',
-    },
-    required: {
-      control: 'boolean',
-      description: 'Whether the label is required (shows asterisk)',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
     },
     error: {
       control: 'text',
       description: 'Error message or boolean to show error state',
+      table: {
+        type: { summary: 'string | boolean' },
+      },
+    },
+    open: {
+      control: 'boolean',
+      description: 'Whether the calendar popover is open (controlled)',
+      table: {
+        type: { summary: 'boolean' },
+      },
+    },
+    onOpenChange: {
+      action: 'openChanged',
+      description: 'Callback fired when open state changes',
+      table: {
+        type: { summary: '(open: boolean) => void' },
+      },
+    },
+    locale: {
+      control: 'text',
+      description: 'Custom locale for date formatting (defaults to browser locale)',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    className: {
+      control: 'text',
+      description: 'Additional CSS classes',
+      table: {
+        type: { summary: 'string' },
+      },
     },
   },
 } satisfies Meta<typeof DateTimePicker>;

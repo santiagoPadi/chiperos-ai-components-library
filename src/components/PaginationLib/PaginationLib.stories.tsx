@@ -7,9 +7,27 @@ const meta: Meta<typeof PaginationLib> = {
   component: PaginationLib,
   tags: ['autodocs'],
   argTypes: {
-    currentPage: { control: 'number' },
-    totalPages: { control: 'number' },
-    onPageChange: { action: 'pageChanged' },
+    currentPage: {
+      control: 'number',
+      description: 'Currently active page number',
+      table: {
+        type: { summary: 'number' },
+      },
+    },
+    totalPages: {
+      control: 'number',
+      description: 'Total number of pages',
+      table: {
+        type: { summary: 'number' },
+      },
+    },
+    onPageChange: {
+      action: 'pageChanged',
+      description: 'Callback when the page changes',
+      table: {
+        type: { summary: '(page: number) => void' },
+      },
+    },
   },
   render: (args) => {
     const [currentPage, setCurrentPage] = useState(args.currentPage);

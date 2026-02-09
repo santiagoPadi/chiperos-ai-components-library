@@ -13,31 +13,86 @@ const meta = {
     value: {
       control: 'text',
       description: 'The current value of the input',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: "''" },
+      },
     },
     placeholder: {
       control: 'text',
       description: 'Placeholder text',
+      table: {
+        type: { summary: 'string' },
+      },
     },
     type: {
       control: 'select',
       options: ['text', 'password', 'email', 'number', 'tel', 'url'],
       description: 'Input type',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: "'text'" },
+      },
     },
     disabled: {
       control: 'boolean',
       description: 'Whether the input is disabled',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
     },
     error: {
       control: 'text',
-      description: 'Error message or boolean to show error state',
+      description: 'Error message or boolean to show error state. External error overrides validation errors.',
+      table: {
+        type: { summary: 'string | boolean' },
+      },
     },
     showPasswordToggle: {
       control: 'boolean',
       description: 'Show password visibility toggle (only for password type)',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    validation: {
+      control: 'object',
+      description: 'Validation rules (email, number, phone, minLength, maxLength, regex, required)',
+      table: {
+        type: { summary: 'InputValidation' },
+      },
+    },
+    validateOnChange: {
+      control: 'boolean',
+      description: 'Whether to validate on every change',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'true' },
+      },
+    },
+    validateOnBlur: {
+      control: 'boolean',
+      description: 'Whether to validate on blur',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'true' },
+      },
+    },
+    className: {
+      control: 'text',
+      description: 'Additional CSS classes',
+      table: {
+        type: { summary: 'string' },
+      },
     },
     onChange: {
       action: 'changed',
-      description: 'Callback fired when the value changes',
+      description: 'Callback fired when the value changes (receives the text string)',
+      table: {
+        type: { summary: '(text: string) => void' },
+      },
     },
   },
 } satisfies Meta<typeof Input>;

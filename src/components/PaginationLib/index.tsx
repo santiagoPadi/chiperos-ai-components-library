@@ -2,9 +2,20 @@ import React from 'react';
 import { cn } from '../../lib/utils';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-interface PaginationLibProps {
+export interface PaginationLibProps {
+  /**
+   * Currently active page number
+   */
   currentPage: number;
+
+  /**
+   * Total number of pages
+   */
   totalPages: number;
+
+  /**
+   * Callback when the page changes
+   */
   onPageChange: (page: number) => void;
 }
 

@@ -21,11 +21,78 @@ const meta: Meta<typeof HeaderLib> = {
         useRouter: () => mockRouter,
     },
     argTypes: {
-        title: { control: 'text' },
-        description: { control: 'text' },
-        goBackText: { control: 'text' },
-        showSearch: { control: 'boolean' },
-        showLanguageSwitcher: { control: 'boolean' },
+        title: {
+            control: 'text',
+            description: 'Main title of the header',
+            table: {
+                type: { summary: 'string' },
+            },
+        },
+        description: {
+            control: 'text',
+            description: 'Description text below the title',
+            table: {
+                type: { summary: 'string' },
+            },
+        },
+        goBackText: {
+            control: 'text',
+            description: 'Text for the go-back button. If omitted, no back button is shown.',
+            table: {
+                type: { summary: 'string' },
+            },
+        },
+        goBackHref: {
+            control: 'text',
+            description: 'URL to navigate to when the back button is clicked',
+            table: {
+                type: { summary: 'string' },
+            },
+        },
+        onBack: {
+            action: 'back',
+            description: 'Custom callback for back button (overrides goBackHref)',
+            table: {
+                type: { summary: '() => void' },
+            },
+        },
+        showSearch: {
+            control: 'boolean',
+            description: 'Whether to show the search icon button',
+            table: {
+                type: { summary: 'boolean' },
+                defaultValue: { summary: 'true' },
+            },
+        },
+        showLanguageSwitcher: {
+            control: 'boolean',
+            description: 'Whether to show the language switcher',
+            table: {
+                type: { summary: 'boolean' },
+                defaultValue: { summary: 'true' },
+            },
+        },
+        onSearch: {
+            action: 'search',
+            description: 'Custom callback when search icon is clicked',
+            table: {
+                type: { summary: '() => void' },
+            },
+        },
+        children: {
+            control: false,
+            description: 'Additional content rendered in the header',
+            table: {
+                type: { summary: 'ReactNode' },
+            },
+        },
+        useRouter: {
+            control: false,
+            description: 'Hook that returns an AppRouterInstance (e.g., Next.js useRouter)',
+            table: {
+                type: { summary: '() => AppRouterInstance' },
+            },
+        },
     },
     decorators: [
         (Story) => (

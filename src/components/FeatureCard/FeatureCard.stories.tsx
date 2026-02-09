@@ -12,15 +12,46 @@ const meta = {
   argTypes: {
     title: {
       control: 'text',
-      description: 'Título de la característica',
+      description: 'Title of the feature',
+      table: {
+        type: { summary: 'string' },
+      },
     },
     description: {
       control: 'text',
-      description: 'Descripción de la característica',
+      description: 'Description of the feature',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+    icon: {
+      control: false,
+      description: 'Icon element rendered in the feature card',
+      table: {
+        type: { summary: 'ReactNode' },
+      },
     },
     iconBackground: {
       control: 'color',
-      description: 'Color de fondo del ícono',
+      description: 'Background color for the icon container',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: "'#e6f8ef'" },
+      },
+    },
+    onClick: {
+      action: 'clicked',
+      description: 'Callback when the card is clicked',
+      table: {
+        type: { summary: '() => void' },
+      },
+    },
+    className: {
+      control: 'text',
+      description: 'Additional CSS classes',
+      table: {
+        type: { summary: 'string' },
+      },
     },
   },
 } satisfies Meta<typeof FeatureCard>;

@@ -12,15 +12,33 @@ const meta = {
   argTypes: {
     status: {
       control: 'boolean',
-      description: 'Estado del switch (on/off)',
+      description: 'Switch state (on/off)',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
     },
     disabled: {
       control: 'boolean',
-      description: 'Si el switch está deshabilitado',
+      description: 'Whether the switch is disabled',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
     },
     onChange: {
       action: 'changed',
-      description: 'Callback que recibe el nuevo estado',
+      description: 'Callback that receives the new status when toggled',
+      table: {
+        type: { summary: '(status: boolean) => void' },
+      },
+    },
+    className: {
+      control: 'text',
+      description: 'Additional CSS classes',
+      table: {
+        type: { summary: 'string' },
+      },
     },
   },
 } satisfies Meta<typeof Switcher>;

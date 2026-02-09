@@ -8,6 +8,62 @@ const meta: Meta<typeof ProgressBarInfo> = {
         layout: 'padded',
     },
     tags: ['autodocs'],
+    argTypes: {
+        segments: {
+            control: 'object',
+            description: 'Array of segments to display (id, label, percentage, change, color)',
+            table: {
+                type: { summary: 'ProgressBarSegment[]' },
+            },
+        },
+        barHeight: {
+            control: 'number',
+            description: 'Height of the progress bar in pixels',
+            table: {
+                type: { summary: 'number' },
+                defaultValue: { summary: '24' },
+            },
+        },
+        borderRadius: {
+            control: 'number',
+            description: 'Border radius of the progress bar',
+            table: {
+                type: { summary: 'number' },
+                defaultValue: { summary: '8' },
+            },
+        },
+        legendColumns: {
+            control: 'number',
+            description: 'Number of columns for the legend grid',
+            table: {
+                type: { summary: 'number' },
+                defaultValue: { summary: '2' },
+            },
+        },
+        showLegend: {
+            control: 'boolean',
+            description: 'Whether to show the legend',
+            table: {
+                type: { summary: 'boolean' },
+                defaultValue: { summary: 'true' },
+            },
+        },
+        legendGap: {
+            control: 'number',
+            description: 'Gap between legend items in pixels',
+            table: {
+                type: { summary: 'number' },
+                defaultValue: { summary: '16' },
+            },
+        },
+        className: {
+            control: 'text',
+            description: 'Additional CSS classes',
+            table: {
+                type: { summary: 'string' },
+            },
+        },
+    },
     decorators: [
         (Story) => (
             <div style={{ maxWidth: '800px', width: '100%' }}>

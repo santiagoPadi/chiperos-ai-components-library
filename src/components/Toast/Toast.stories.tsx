@@ -16,15 +16,32 @@ const meta: Meta<ToastProps> = {
     type: {
       control: 'select',
       options: ['success', 'error', 'warning', 'info'],
-      description: 'Type of toast notification',
+      description: 'Type of toast notification (determines color and icon)',
+      table: {
+        type: { summary: "'success' | 'error' | 'warning' | 'info'" },
+        defaultValue: { summary: "'success'" },
+      },
     },
     message: {
       control: 'text',
-      description: 'Message to display in the toast',
+      description: 'Message text to display in the toast',
+      table: {
+        type: { summary: 'string' },
+      },
     },
     onClose: {
       action: 'closed',
-      description: 'Callback when close button is clicked',
+      description: 'Callback when close button is clicked. If omitted, close button is hidden.',
+      table: {
+        type: { summary: '() => void' },
+      },
+    },
+    className: {
+      control: 'text',
+      description: 'Additional CSS classes for custom styling',
+      table: {
+        type: { summary: 'string' },
+      },
     },
   },
 };

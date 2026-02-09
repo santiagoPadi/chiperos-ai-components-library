@@ -19,16 +19,43 @@ const meta = {
     size: {
       control: 'select',
       options: ['large', 'small'],
-      description: 'Tamaño del logo',
+      description: 'Size of the logo',
+      table: {
+        type: { summary: "'large' | 'small'" },
+        defaultValue: { summary: "'large'" },
+      },
     },
     mode: {
       control: 'select',
       options: ['dark', 'light'],
-      description: 'Modo de color del logo',
+      description: 'Color mode of the logo',
+      table: {
+        type: { summary: "'dark' | 'light'" },
+        defaultValue: { summary: "'dark'" },
+      },
     },
     gradient: {
       control: 'boolean',
-      description: 'Si el logo tiene gradiente',
+      description: 'Whether the logo uses gradient styling',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    alt: {
+      control: 'text',
+      description: 'Alt text for the logo image',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: "'Chiperos Logo'" },
+      },
+    },
+    className: {
+      control: 'text',
+      description: 'Additional CSS classes',
+      table: {
+        type: { summary: 'string' },
+      },
     },
   },
 } satisfies Meta<typeof BrandIcons>;

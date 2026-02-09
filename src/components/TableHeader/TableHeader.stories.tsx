@@ -14,27 +14,97 @@ const meta = {
   argTypes: {
     title: {
       control: 'text',
-      description: 'Title shown at the top',
+      description: 'Title shown at the top of the header',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: "'Table Header'" },
+      },
     },
     showTitle: {
       control: 'boolean',
-      description: 'Show title',
+      description: 'Whether to show the title',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
     },
     searchPlaceholder: {
       control: 'text',
-      description: 'Search field placeholder',
+      description: 'Placeholder text for the search input',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: "'Search by...'" },
+      },
+    },
+    searchValue: {
+      control: 'text',
+      description: 'Controlled search input value',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: "''" },
+      },
+    },
+    onSearchChange: {
+      action: 'searchChanged',
+      description: 'Callback when search input value changes',
+      table: {
+        type: { summary: '(value: string) => void' },
+      },
+    },
+    filters: {
+      control: false,
+      description: 'Array of filter definitions (select or date type)',
+      table: {
+        type: { summary: 'TableHeaderFilter[]' },
+        defaultValue: { summary: '[]' },
+      },
     },
     showFilters: {
       control: 'boolean',
-      description: 'Show filters row',
+      description: 'Whether to show the filters row',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'true' },
+      },
+    },
+    buttons: {
+      control: false,
+      description: 'Array of button definitions (label, variant, dropdown support)',
+      table: {
+        type: { summary: 'TableHeaderButton[]' },
+        defaultValue: { summary: '[]' },
+      },
     },
     showButtons: {
       control: 'boolean',
-      description: 'Show buttons',
+      description: 'Whether to show action buttons',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'true' },
+      },
+    },
+    cards: {
+      control: false,
+      description: 'Array of KPI card definitions (label, value, icon)',
+      table: {
+        type: { summary: 'TableHeaderCard[]' },
+        defaultValue: { summary: '[]' },
+      },
     },
     showCards: {
       control: 'boolean',
-      description: 'Show KPI cards',
+      description: 'Whether to show the KPI cards row',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    className: {
+      control: 'text',
+      description: 'Additional CSS classes',
+      table: {
+        type: { summary: 'string' },
+      },
     },
   },
 } satisfies Meta<typeof TableHeader>;

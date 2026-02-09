@@ -62,6 +62,12 @@ interface SelectBaseProps {
    * Placeholder text for the search input
    */
   searchPlaceholder?: string;
+
+  /**
+   * Error message or state - shows error styling when truthy.
+   * When a string is provided it is displayed below the select.
+   */
+  error?: string | boolean;
 }
 
 // Single select props
@@ -145,6 +151,7 @@ const MultiSelect = forwardRef<HTMLButtonElement, MultipleSelectProps>(
       search = false,
       onSearch,
       searchPlaceholder = 'Search...',
+      error,
     },
     ref
   ) => {
@@ -153,6 +160,8 @@ const MultiSelect = forwardRef<HTMLButtonElement, MultipleSelectProps>(
     const triggerRef = useRef<HTMLButtonElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
     const isPrimary = variant === 'primary';
+    const hasError = !!error;
+    const displayError = typeof error === 'string' ? error : null;
 
     // Debounced search callback
     const debouncedSearch = useDebounce(
@@ -298,81 +307,261 @@ const MultiSelect = forwardRef<HTMLButtonElement, MultipleSelectProps>(
       </div>
     );
 
+    // Error message element (shared between search and non-search modes)
+    const errorMessage = displayError ? (
+      <p
+        className="mt-1 text-sm text-[#ff305f]"
+        data-testid="select-error"
+        role="alert"
+      >
+        {displayError}
+      </p>
+    ) : null;
+
     // Search mode: trigger IS the input (but input only active when open)
     if (search) {
       return (
+        <div className="w-full">
+          <Popover.Root open={open} onOpenChange={setOpen}>
+            <Popover.Anchor asChild>
+              <div
+                onClick={handleTriggerClick}
+                className={cn(
+                  'relative flex items-center gap-2',
+                  'rounded',
+                  'transition-all',
+                  !open && 'cursor-pointer',
+                  !isPrimary && [
+                    'w-full',
+                    'border',
+                    hasError && !disabled ? 'border-[#ff305f]' : 'border-[#ecebf0]',
+                    'bg-white',
+                    !hasError && 'hover:border-[#a29fba]',
+                    !hasError && open && 'border-[#a29fba]',
+                    disabled && 'opacity-50 cursor-not-allowed bg-[#f4f4f4]',
+                  ],
+                  isPrimary && [
+                    'bg-[#00b56b]',
+                    'border border-[#00b56b]',
+                    'hover:bg-[#00995a] hover:border-[#00995a]',
+                    open && 'bg-[#00995a] border-[#00995a]',
+                    disabled && 'bg-[#e0e0e0] border-[#e0e0e0] cursor-not-allowed',
+                  ],
+                  className
+                )}
+                data-testid="select-trigger"
+              >
+                {/* Search icon - only shown when open */}
+                {open && (
+                  <Search
+                    size={16}
+                    className={cn(
+                      'absolute left-4 shrink-0',
+                      isPrimary ? 'text-white/70' : 'text-[#a29fba]'
+                    )}
+                  />
+                )}
+                
+                {/* Input field - only editable when open */}
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  value={open ? searchTerm : (hasSelection ? getDisplayText() : '')}
+                  onChange={handleSearchChange}
+                  readOnly={!open}
+                  placeholder={open ? (searchPlaceholder || placeholder) : (hasSelection ? getDisplayText() : placeholder)}
+                  disabled={disabled}
+                  className={cn(
+                    'flex-1 w-full py-3',
+                    'bg-transparent',
+                    'text-sm leading-4',
+                    'rounded',
+                    'focus:outline-none',
+                    // Padding left changes based on whether search icon is shown
+                    open ? 'pl-10' : 'pl-4',
+                    // Cursor changes based on state
+                    !open && 'cursor-pointer',
+                    !isPrimary && [
+                      'text-[#312e4d]',
+                      'placeholder:text-[#a29fba]',
+                    ],
+                    isPrimary && [
+                      'text-white',
+                      'placeholder:text-white/70',
+                    ],
+                    disabled && 'cursor-not-allowed',
+                    // Adjust padding based on whether clear button is shown
+                    hasSelection && !disabled ? 'pr-16' : 'pr-10'
+                  )}
+                  data-testid="select-search-input"
+                  aria-invalid={hasError}
+                />
+
+                {/* Clear button for multiple selections */}
+                {hasSelection && !disabled && (
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    onClick={handleClearAll}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleClearAll(e as unknown as React.MouseEvent);
+                      }
+                    }}
+                    className={cn(
+                      'absolute right-8 shrink-0 p-0.5 rounded-full transition-colors cursor-pointer',
+                      isPrimary
+                        ? 'hover:bg-white/20 text-white'
+                        : 'hover:bg-[#ecebf0] text-[#575385]'
+                    )}
+                    data-testid="select-clear"
+                    aria-label="Clear selection"
+                  >
+                    <X size={14} />
+                  </span>
+                )}
+
+                {/* Chevron icon */}
+                <ChevronDown
+                  size={16}
+                  className={cn(
+                    'absolute right-4 shrink-0 transition-transform pointer-events-none',
+                    open && 'rotate-180',
+                    isPrimary ? 'text-white' : 'text-[#312e4d]'
+                  )}
+                  data-testid="select-icon"
+                />
+              </div>
+            </Popover.Anchor>
+
+            <Popover.Portal>
+              <Popover.Content
+                className={cn(
+                  'overflow-hidden',
+                  'bg-white',
+                  'rounded',
+                  'border border-[#ecebf0]',
+                  'shadow-lg',
+                  'z-50',
+                  isPrimary
+                    ? 'min-w-[var(--radix-popover-trigger-width)]'
+                    : 'w-[var(--radix-popover-trigger-width)]'
+                )}
+                sideOffset={4}
+                align={isPrimary ? 'end' : 'start'}
+                onOpenAutoFocus={(e) => e.preventDefault()}
+                data-testid="select-content"
+              >
+                {renderOptions()}
+              </Popover.Content>
+            </Popover.Portal>
+          </Popover.Root>
+          {errorMessage}
+        </div>
+      );
+    }
+
+    // Non-search mode: regular button trigger
+    return (
+      <div className="w-full">
         <Popover.Root open={open} onOpenChange={setOpen}>
-          <Popover.Anchor asChild>
-            <div
-              onClick={handleTriggerClick}
+          <Popover.Trigger asChild disabled={disabled}>
+            <button
+              ref={triggerRef}
+              type="button"
               className={cn(
-                'relative flex items-center gap-2',
+                // Layout
+                'flex items-center justify-center gap-2',
+                'px-4 py-3',
                 'rounded',
+                'font-semibold',
+
+                // Typography
+                'text-left',
+
+                // States
                 'transition-all',
-                !open && 'cursor-pointer',
+                'focus:outline-none focus:ring-0',
+
+                // Default variant
                 !isPrimary && [
                   'w-full',
-                  'border border-[#ecebf0]',
+                  'border',
+                  hasError && !disabled ? 'border-[#ff305f]' : 'border-[#ecebf0]',
                   'bg-white',
-                  'hover:border-[#a29fba]',
-                  open && 'border-[#a29fba]',
+                  !hasError && 'hover:border-[#a29fba]',
+                  !hasError && 'focus:border-[#a29fba]',
+                  !hasError && open && 'border-[#a29fba]',
                   disabled && 'opacity-50 cursor-not-allowed bg-[#f4f4f4]',
                 ],
+
+                // Primary variant (like primary button)
                 isPrimary && [
-                  'bg-[#00b56b]',
+                  'bg-[#00b56b] text-white',
                   'border border-[#00b56b]',
                   'hover:bg-[#00995a] hover:border-[#00995a]',
+                  'active:bg-[#007a48] active:border-[#007a48]',
                   open && 'bg-[#00995a] border-[#00995a]',
-                  disabled && 'bg-[#e0e0e0] border-[#e0e0e0] cursor-not-allowed',
+                  disabled && 'bg-[#e0e0e0] border-[#e0e0e0] text-[#9e9e9e] cursor-not-allowed',
                 ],
+
                 className
               )}
               data-testid="select-trigger"
+              aria-label={label || placeholder}
+              aria-invalid={hasError}
+              disabled={disabled}
             >
-              {/* Search icon - only shown when open */}
-              {open && (
-                <Search
-                  size={16}
-                  className={cn(
-                    'absolute left-4 shrink-0',
-                    isPrimary ? 'text-white/70' : 'text-[#a29fba]'
+              {/* For default variant: show label and value stacked */}
+              {!isPrimary && (
+                <div className="flex flex-col flex-1 min-w-0">
+                  {/* Label (shown only when no value is selected) */}
+                  {label && !hasSelection && (
+                    <span
+                      className="text-xs leading-normal font-medium text-[#575385]"
+                      data-testid="select-label"
+                    >
+                      {label}
+                    </span>
                   )}
-                />
+
+                  {/* Selected value or placeholder */}
+                  <span
+                    className={cn(
+                      'text-sm leading-4 font-normal truncate',
+                      hasSelection ? 'text-[#312e4d]' : 'text-[#312e4d]',
+                      !hasSelection && !label && 'text-base leading-5'
+                    )}
+                    data-testid="select-value"
+                  >
+                    {getDisplayText()}
+                  </span>
+                </div>
               )}
-              
-              {/* Input field - only editable when open */}
-              <input
-                ref={searchInputRef}
-                type="text"
-                value={open ? searchTerm : (hasSelection ? getDisplayText() : '')}
-                onChange={handleSearchChange}
-                readOnly={!open}
-                placeholder={open ? (searchPlaceholder || placeholder) : (hasSelection ? getDisplayText() : placeholder)}
-                disabled={disabled}
-                className={cn(
-                  'flex-1 w-full py-3',
-                  'bg-transparent',
-                  'text-sm leading-4',
-                  'rounded',
-                  'focus:outline-none',
-                  // Padding left changes based on whether search icon is shown
-                  open ? 'pl-10' : 'pl-4',
-                  // Cursor changes based on state
-                  !open && 'cursor-pointer',
-                  !isPrimary && [
-                    'text-[#312e4d]',
-                    'placeholder:text-[#a29fba]',
-                  ],
-                  isPrimary && [
-                    'text-white',
-                    'placeholder:text-white/70',
-                  ],
-                  disabled && 'cursor-not-allowed',
-                  // Adjust padding based on whether clear button is shown
-                  hasSelection && !disabled ? 'pr-16' : 'pr-10'
-                )}
-                data-testid="select-search-input"
-              />
+
+              {/* For primary variant: show label (if provided) and value */}
+              {isPrimary && (
+                <div className="flex flex-col min-w-0">
+                  {/* Label (shown only when no value is selected) */}
+                  {label && !hasSelection && (
+                    <span
+                      className="text-xs leading-normal text-white"
+                      data-testid="select-label"
+                    >
+                      {label}
+                    </span>
+                  )}
+
+                  {/* Selected value or placeholder */}
+                  <span
+                    className="text-sm leading-4 whitespace-nowrap"
+                    data-testid="select-value"
+                  >
+                    {getDisplayText()}
+                  </span>
+                </div>
+              )}
 
               {/* Clear button for multiple selections */}
               {hasSelection && !disabled && (
@@ -387,7 +576,7 @@ const MultiSelect = forwardRef<HTMLButtonElement, MultipleSelectProps>(
                     }
                   }}
                   className={cn(
-                    'absolute right-8 shrink-0 p-0.5 rounded-full transition-colors cursor-pointer',
+                    'shrink-0 p-0.5 rounded-full transition-colors cursor-pointer',
                     isPrimary
                       ? 'hover:bg-white/20 text-white'
                       : 'hover:bg-[#ecebf0] text-[#575385]'
@@ -399,18 +588,17 @@ const MultiSelect = forwardRef<HTMLButtonElement, MultipleSelectProps>(
                 </span>
               )}
 
-              {/* Chevron icon */}
               <ChevronDown
                 size={16}
                 className={cn(
-                  'absolute right-4 shrink-0 transition-transform pointer-events-none',
+                  'shrink-0 transition-transform',
                   open && 'rotate-180',
                   isPrimary ? 'text-white' : 'text-[#312e4d]'
                 )}
                 data-testid="select-icon"
               />
-            </div>
-          </Popover.Anchor>
+            </button>
+          </Popover.Trigger>
 
           <Popover.Portal>
             <Popover.Content
@@ -427,172 +615,14 @@ const MultiSelect = forwardRef<HTMLButtonElement, MultipleSelectProps>(
               )}
               sideOffset={4}
               align={isPrimary ? 'end' : 'start'}
-              onOpenAutoFocus={(e) => e.preventDefault()}
               data-testid="select-content"
             >
               {renderOptions()}
             </Popover.Content>
           </Popover.Portal>
         </Popover.Root>
-      );
-    }
-
-    // Non-search mode: regular button trigger
-    return (
-      <Popover.Root open={open} onOpenChange={setOpen}>
-        <Popover.Trigger asChild disabled={disabled}>
-          <button
-            ref={triggerRef}
-            type="button"
-            className={cn(
-              // Layout
-              'flex items-center justify-center gap-2',
-              'px-4 py-3',
-              'rounded',
-              'font-semibold',
-
-              // Typography
-              'text-left',
-
-              // States
-              'transition-all',
-              'focus:outline-none focus:ring-0',
-
-              // Default variant
-              !isPrimary && [
-                'w-full',
-                'border border-[#ecebf0]',
-                'bg-white',
-                'hover:border-[#a29fba]',
-                'focus:border-[#a29fba]',
-                open && 'border-[#a29fba]',
-                disabled && 'opacity-50 cursor-not-allowed bg-[#f4f4f4]',
-              ],
-
-              // Primary variant (like primary button)
-              isPrimary && [
-                'bg-[#00b56b] text-white',
-                'border border-[#00b56b]',
-                'hover:bg-[#00995a] hover:border-[#00995a]',
-                'active:bg-[#007a48] active:border-[#007a48]',
-                open && 'bg-[#00995a] border-[#00995a]',
-                disabled && 'bg-[#e0e0e0] border-[#e0e0e0] text-[#9e9e9e] cursor-not-allowed',
-              ],
-
-              className
-            )}
-            data-testid="select-trigger"
-            aria-label={label || placeholder}
-            disabled={disabled}
-          >
-            {/* For default variant: show label and value stacked */}
-            {!isPrimary && (
-              <div className="flex flex-col flex-1 min-w-0">
-                {/* Label (shown only when no value is selected) */}
-                {label && !hasSelection && (
-                  <span
-                    className="text-xs leading-normal font-medium text-[#575385]"
-                    data-testid="select-label"
-                  >
-                    {label}
-                  </span>
-                )}
-
-                {/* Selected value or placeholder */}
-                <span
-                  className={cn(
-                    'text-sm leading-4 font-normal truncate',
-                    hasSelection ? 'text-[#312e4d]' : 'text-[#312e4d]',
-                    !hasSelection && !label && 'text-base leading-5'
-                  )}
-                  data-testid="select-value"
-                >
-                  {getDisplayText()}
-                </span>
-              </div>
-            )}
-
-            {/* For primary variant: show label (if provided) and value */}
-            {isPrimary && (
-              <div className="flex flex-col min-w-0">
-                {/* Label (shown only when no value is selected) */}
-                {label && !hasSelection && (
-                  <span
-                    className="text-xs leading-normal text-white"
-                    data-testid="select-label"
-                  >
-                    {label}
-                  </span>
-                )}
-
-                {/* Selected value or placeholder */}
-                <span
-                  className="text-sm leading-4 whitespace-nowrap"
-                  data-testid="select-value"
-                >
-                  {getDisplayText()}
-                </span>
-              </div>
-            )}
-
-            {/* Clear button for multiple selections */}
-            {hasSelection && !disabled && (
-              <span
-                role="button"
-                tabIndex={0}
-                onClick={handleClearAll}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleClearAll(e as unknown as React.MouseEvent);
-                  }
-                }}
-                className={cn(
-                  'shrink-0 p-0.5 rounded-full transition-colors cursor-pointer',
-                  isPrimary
-                    ? 'hover:bg-white/20 text-white'
-                    : 'hover:bg-[#ecebf0] text-[#575385]'
-                )}
-                data-testid="select-clear"
-                aria-label="Clear selection"
-              >
-                <X size={14} />
-              </span>
-            )}
-
-            <ChevronDown
-              size={16}
-              className={cn(
-                'shrink-0 transition-transform',
-                open && 'rotate-180',
-                isPrimary ? 'text-white' : 'text-[#312e4d]'
-              )}
-              data-testid="select-icon"
-            />
-          </button>
-        </Popover.Trigger>
-
-        <Popover.Portal>
-          <Popover.Content
-            className={cn(
-              'overflow-hidden',
-              'bg-white',
-              'rounded',
-              'border border-[#ecebf0]',
-              'shadow-lg',
-              'z-50',
-              isPrimary
-                ? 'min-w-[var(--radix-popover-trigger-width)]'
-                : 'w-[var(--radix-popover-trigger-width)]'
-            )}
-            sideOffset={4}
-            align={isPrimary ? 'end' : 'start'}
-            data-testid="select-content"
-          >
-            {renderOptions()}
-          </Popover.Content>
-        </Popover.Portal>
-      </Popover.Root>
+        {errorMessage}
+      </div>
     );
   }
 );
@@ -614,6 +644,7 @@ const SingleSelect = forwardRef<HTMLButtonElement, SingleSelectProps>(
       search = false,
       onSearch,
       searchPlaceholder = 'Search...',
+      error,
     },
     ref
   ) => {
@@ -625,6 +656,8 @@ const SingleSelect = forwardRef<HTMLButtonElement, SingleSelectProps>(
     const selectedOption = options.find((opt) => opt.id === value);
     const displayText = selectedOption?.text || placeholder;
     const isPrimary = variant === 'primary';
+    const hasError = !!error;
+    const displayError = typeof error === 'string' ? error : null;
 
     // Debounced search callback
     const debouncedSearch = useDebounce(
@@ -694,92 +727,258 @@ const SingleSelect = forwardRef<HTMLButtonElement, SingleSelectProps>(
       }
     };
 
+    // Error message element (shared between search and non-search modes)
+    const errorMessage = displayError ? (
+      <p
+        className="mt-1 text-sm text-[#ff305f]"
+        data-testid="select-error"
+        role="alert"
+      >
+        {displayError}
+      </p>
+    ) : null;
+
     // Use Popover-based select when search is enabled - trigger IS the input
     if (search) {
       return (
+        <div className="w-full">
+          <Popover.Root open={open} onOpenChange={setOpen}>
+            <Popover.Anchor asChild>
+              <div
+                onClick={handleTriggerClick}
+                className={cn(
+                  'relative flex items-center gap-2',
+                  'rounded',
+                  'transition-all',
+                  !open && 'cursor-pointer',
+                  !isPrimary && [
+                    'w-full',
+                    'border',
+                    hasError && !disabled ? 'border-[#ff305f]' : 'border-[#ecebf0]',
+                    'bg-white',
+                    !hasError && 'hover:border-[#a29fba]',
+                    !hasError && open && 'border-[#a29fba]',
+                    disabled && 'opacity-50 cursor-not-allowed bg-[#f4f4f4]',
+                  ],
+                  isPrimary && [
+                    'bg-[#00b56b]',
+                    'border border-[#00b56b]',
+                    'hover:bg-[#00995a] hover:border-[#00995a]',
+                    open && 'bg-[#00995a] border-[#00995a]',
+                    disabled && 'bg-[#e0e0e0] border-[#e0e0e0] cursor-not-allowed',
+                  ],
+                  className
+                )}
+                data-testid="select-trigger"
+              >
+                {/* Search icon - only shown when open */}
+                {open && (
+                  <Search
+                    size={16}
+                    className={cn(
+                      'absolute left-4 shrink-0',
+                      isPrimary ? 'text-white/70' : 'text-[#a29fba]'
+                    )}
+                  />
+                )}
+                
+                {/* Input field - only editable when open */}
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  value={open ? searchTerm : (selectedOption?.text || '')}
+                  onChange={handleSearchChange}
+                  readOnly={!open}
+                  placeholder={open ? (searchPlaceholder || placeholder) : (selectedOption?.text || placeholder)}
+                  disabled={disabled}
+                  className={cn(
+                    'flex-1 w-full pr-10 py-3',
+                    'bg-transparent',
+                    'text-sm leading-4',
+                    'rounded',
+                    'focus:outline-none',
+                    // Padding left changes based on whether search icon is shown
+                    open ? 'pl-10' : 'pl-4',
+                    // Cursor changes based on state
+                    !open && 'cursor-pointer',
+                    !isPrimary && [
+                      'text-[#312e4d]',
+                      'placeholder:text-[#a29fba]',
+                    ],
+                    isPrimary && [
+                      'text-white',
+                      'placeholder:text-white/70',
+                    ],
+                    disabled && 'cursor-not-allowed'
+                  )}
+                  data-testid="select-search-input"
+                  aria-invalid={hasError}
+                />
+
+                {/* Chevron icon */}
+                <ChevronDown
+                  size={16}
+                  className={cn(
+                    'absolute right-4 shrink-0 transition-transform pointer-events-none',
+                    open && 'rotate-180',
+                    isPrimary ? 'text-white' : 'text-[#312e4d]'
+                  )}
+                  data-testid="select-icon"
+                />
+              </div>
+            </Popover.Anchor>
+
+            <Popover.Portal>
+              <Popover.Content
+                className={cn(
+                  'overflow-hidden',
+                  'bg-white',
+                  'rounded',
+                  'border border-[#ecebf0]',
+                  'shadow-lg',
+                  'z-50',
+                  isPrimary
+                    ? 'min-w-[var(--radix-popover-trigger-width)]'
+                    : 'w-[var(--radix-popover-trigger-width)]'
+                )}
+                sideOffset={4}
+                align={isPrimary ? 'end' : 'start'}
+                onOpenAutoFocus={(e) => e.preventDefault()}
+                data-testid="select-content"
+              >
+                <div className="p-1 max-h-[250px] overflow-y-auto">
+                  {filteredOptions.length === 0 ? (
+                    <div className="px-4 py-3 text-sm text-[#a29fba] text-center">
+                      No options found
+                    </div>
+                  ) : (
+                    filteredOptions.map((option) => (
+                      <div
+                        key={option.id}
+                        className={cn(
+                          'relative flex items-center',
+                          'px-4 py-2',
+                          'text-sm leading-4 text-[#312e4d]',
+                          'rounded',
+                          'cursor-pointer',
+                          'select-none',
+                          'outline-none',
+                          'transition-colors',
+                          'hover:bg-[#f4f4f4]',
+                          value === option.id && 'bg-[#ecebf0]',
+                          isPrimary && 'whitespace-nowrap'
+                        )}
+                        onClick={() => handleSelectOption(option.id)}
+                        data-testid={`select-option-${option.id}`}
+                      >
+                        <span className="flex-1">{option.text}</span>
+                        {value === option.id && (
+                          <Check size={16} className="text-[#00b56b] shrink-0" />
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+              </Popover.Content>
+            </Popover.Portal>
+          </Popover.Root>
+          {errorMessage}
+        </div>
+      );
+    }
+
+    // Standard Radix Select for non-search mode
+    return (
+      <div className="w-full">
         <Popover.Root open={open} onOpenChange={setOpen}>
-          <Popover.Anchor asChild>
-            <div
-              onClick={handleTriggerClick}
+          <Popover.Trigger asChild disabled={disabled}>
+            <button
+              ref={triggerRef}
+              type="button"
               className={cn(
-                'relative flex items-center gap-2',
+                'flex items-center justify-center gap-2',
+                'px-4 py-3',
                 'rounded',
+                'font-semibold',
+                'text-left',
                 'transition-all',
-                !open && 'cursor-pointer',
+                'focus:outline-none focus:ring-0',
                 !isPrimary && [
                   'w-full',
-                  'border border-[#ecebf0]',
+                  'border',
+                  hasError && !disabled ? 'border-[#ff305f]' : 'border-[#ecebf0]',
                   'bg-white',
-                  'hover:border-[#a29fba]',
-                  open && 'border-[#a29fba]',
+                  !hasError && 'hover:border-[#a29fba]',
+                  !hasError && 'focus:border-[#a29fba]',
+                  !hasError && open && 'border-[#a29fba]',
                   disabled && 'opacity-50 cursor-not-allowed bg-[#f4f4f4]',
                 ],
                 isPrimary && [
-                  'bg-[#00b56b]',
+                  'bg-[#00b56b] text-white',
                   'border border-[#00b56b]',
                   'hover:bg-[#00995a] hover:border-[#00995a]',
+                  'active:bg-[#007a48] active:border-[#007a48]',
                   open && 'bg-[#00995a] border-[#00995a]',
-                  disabled && 'bg-[#e0e0e0] border-[#e0e0e0] cursor-not-allowed',
+                  disabled && 'bg-[#e0e0e0] border-[#e0e0e0] text-[#9e9e9e] cursor-not-allowed',
                 ],
                 className
               )}
               data-testid="select-trigger"
+              aria-label={label || placeholder}
+              aria-invalid={hasError}
+              disabled={disabled}
             >
-              {/* Search icon - only shown when open */}
-              {open && (
-                <Search
-                  size={16}
-                  className={cn(
-                    'absolute left-4 shrink-0',
-                    isPrimary ? 'text-white/70' : 'text-[#a29fba]'
+              {!isPrimary && (
+                <div className="flex flex-col flex-1 min-w-0">
+                  {label && !selectedOption && (
+                    <span
+                      className="text-xs leading-normal font-medium text-[#575385]"
+                      data-testid="select-label"
+                    >
+                      {label}
+                    </span>
                   )}
-                />
+                  <span
+                    className={cn(
+                      'text-sm leading-4 font-normal truncate',
+                      selectedOption ? 'text-[#312e4d]' : 'text-[#312e4d]',
+                      !selectedOption && !label && 'text-base leading-5'
+                    )}
+                    data-testid="select-value"
+                  >
+                    {displayText}
+                  </span>
+                </div>
               )}
-              
-              {/* Input field - only editable when open */}
-              <input
-                ref={searchInputRef}
-                type="text"
-                value={open ? searchTerm : (selectedOption?.text || '')}
-                onChange={handleSearchChange}
-                readOnly={!open}
-                placeholder={open ? (searchPlaceholder || placeholder) : (selectedOption?.text || placeholder)}
-                disabled={disabled}
-                className={cn(
-                  'flex-1 w-full pr-10 py-3',
-                  'bg-transparent',
-                  'text-sm leading-4',
-                  'rounded',
-                  'focus:outline-none',
-                  // Padding left changes based on whether search icon is shown
-                  open ? 'pl-10' : 'pl-4',
-                  // Cursor changes based on state
-                  !open && 'cursor-pointer',
-                  !isPrimary && [
-                    'text-[#312e4d]',
-                    'placeholder:text-[#a29fba]',
-                  ],
-                  isPrimary && [
-                    'text-white',
-                    'placeholder:text-white/70',
-                  ],
-                  disabled && 'cursor-not-allowed'
-                )}
-                data-testid="select-search-input"
-              />
-
-              {/* Chevron icon */}
+              {isPrimary && (
+                <div className="flex flex-col min-w-0">
+                  {label && !selectedOption && (
+                    <span
+                      className="text-xs leading-normal text-white"
+                      data-testid="select-label"
+                    >
+                      {label}
+                    </span>
+                  )}
+                  <span
+                    className="text-sm leading-4 whitespace-nowrap"
+                    data-testid="select-value"
+                  >
+                    {displayText}
+                  </span>
+                </div>
+              )}
               <ChevronDown
                 size={16}
                 className={cn(
-                  'absolute right-4 shrink-0 transition-transform pointer-events-none',
+                  'shrink-0 transition-transform',
                   open && 'rotate-180',
                   isPrimary ? 'text-white' : 'text-[#312e4d]'
                 )}
                 data-testid="select-icon"
               />
-            </div>
-          </Popover.Anchor>
+            </button>
+          </Popover.Trigger>
 
           <Popover.Portal>
             <Popover.Content
@@ -796,185 +995,40 @@ const SingleSelect = forwardRef<HTMLButtonElement, SingleSelectProps>(
               )}
               sideOffset={4}
               align={isPrimary ? 'end' : 'start'}
-              onOpenAutoFocus={(e) => e.preventDefault()}
               data-testid="select-content"
             >
-              <div className="p-1 max-h-[250px] overflow-y-auto">
-                {filteredOptions.length === 0 ? (
-                  <div className="px-4 py-3 text-sm text-[#a29fba] text-center">
-                    No options found
+              <div className="p-1 max-h-[300px] overflow-y-auto">
+                {options.map((option) => (
+                  <div
+                    key={option.id}
+                    className={cn(
+                      'relative flex items-center',
+                      'px-4 py-2',
+                      'text-sm leading-4 text-[#312e4d]',
+                      'rounded',
+                      'cursor-pointer',
+                      'select-none',
+                      'outline-none',
+                      'transition-colors',
+                      'hover:bg-[#f4f4f4]',
+                      value === option.id && 'bg-[#ecebf0]',
+                      isPrimary && 'whitespace-nowrap'
+                    )}
+                    onClick={() => handleSelectOption(option.id)}
+                    data-testid={`select-option-${option.id}`}
+                  >
+                    <span className="flex-1">{option.text}</span>
+                    {value === option.id && (
+                      <Check size={16} className="text-[#00b56b] shrink-0" />
+                    )}
                   </div>
-                ) : (
-                  filteredOptions.map((option) => (
-                    <div
-                      key={option.id}
-                      className={cn(
-                        'relative flex items-center',
-                        'px-4 py-2',
-                        'text-sm leading-4 text-[#312e4d]',
-                        'rounded',
-                        'cursor-pointer',
-                        'select-none',
-                        'outline-none',
-                        'transition-colors',
-                        'hover:bg-[#f4f4f4]',
-                        value === option.id && 'bg-[#ecebf0]',
-                        isPrimary && 'whitespace-nowrap'
-                      )}
-                      onClick={() => handleSelectOption(option.id)}
-                      data-testid={`select-option-${option.id}`}
-                    >
-                      <span className="flex-1">{option.text}</span>
-                      {value === option.id && (
-                        <Check size={16} className="text-[#00b56b] shrink-0" />
-                      )}
-                    </div>
-                  ))
-                )}
+                ))}
               </div>
             </Popover.Content>
           </Popover.Portal>
         </Popover.Root>
-      );
-    }
-
-    // Standard Radix Select for non-search mode
-    return (
-      <Popover.Root open={open} onOpenChange={setOpen}>
-        <Popover.Trigger asChild disabled={disabled}>
-          <button
-            ref={triggerRef}
-            type="button"
-            className={cn(
-              'flex items-center justify-center gap-2',
-              'px-4 py-3',
-              'rounded',
-              'font-semibold',
-              'text-left',
-              'transition-all',
-              'focus:outline-none focus:ring-0',
-              !isPrimary && [
-                'w-full',
-                'border border-[#ecebf0]',
-                'bg-white',
-                'hover:border-[#a29fba]',
-                'focus:border-[#a29fba]',
-                open && 'border-[#a29fba]',
-                disabled && 'opacity-50 cursor-not-allowed bg-[#f4f4f4]',
-              ],
-              isPrimary && [
-                'bg-[#00b56b] text-white',
-                'border border-[#00b56b]',
-                'hover:bg-[#00995a] hover:border-[#00995a]',
-                'active:bg-[#007a48] active:border-[#007a48]',
-                open && 'bg-[#00995a] border-[#00995a]',
-                disabled && 'bg-[#e0e0e0] border-[#e0e0e0] text-[#9e9e9e] cursor-not-allowed',
-              ],
-              className
-            )}
-            data-testid="select-trigger"
-            aria-label={label || placeholder}
-            disabled={disabled}
-          >
-            {!isPrimary && (
-              <div className="flex flex-col flex-1 min-w-0">
-                {label && !selectedOption && (
-                  <span
-                    className="text-xs leading-normal font-medium text-[#575385]"
-                    data-testid="select-label"
-                  >
-                    {label}
-                  </span>
-                )}
-                <span
-                  className={cn(
-                    'text-sm leading-4 font-normal truncate',
-                    selectedOption ? 'text-[#312e4d]' : 'text-[#312e4d]',
-                    !selectedOption && !label && 'text-base leading-5'
-                  )}
-                  data-testid="select-value"
-                >
-                  {displayText}
-                </span>
-              </div>
-            )}
-            {isPrimary && (
-              <div className="flex flex-col min-w-0">
-                {label && !selectedOption && (
-                  <span
-                    className="text-xs leading-normal text-white"
-                    data-testid="select-label"
-                  >
-                    {label}
-                  </span>
-                )}
-                <span
-                  className="text-sm leading-4 whitespace-nowrap"
-                  data-testid="select-value"
-                >
-                  {displayText}
-                </span>
-              </div>
-            )}
-            <ChevronDown
-              size={16}
-              className={cn(
-                'shrink-0 transition-transform',
-                open && 'rotate-180',
-                isPrimary ? 'text-white' : 'text-[#312e4d]'
-              )}
-              data-testid="select-icon"
-            />
-          </button>
-        </Popover.Trigger>
-
-        <Popover.Portal>
-          <Popover.Content
-            className={cn(
-              'overflow-hidden',
-              'bg-white',
-              'rounded',
-              'border border-[#ecebf0]',
-              'shadow-lg',
-              'z-50',
-              isPrimary
-                ? 'min-w-[var(--radix-popover-trigger-width)]'
-                : 'w-[var(--radix-popover-trigger-width)]'
-            )}
-            sideOffset={4}
-            align={isPrimary ? 'end' : 'start'}
-            data-testid="select-content"
-          >
-            <div className="p-1 max-h-[300px] overflow-y-auto">
-              {options.map((option) => (
-                <div
-                  key={option.id}
-                  className={cn(
-                    'relative flex items-center',
-                    'px-4 py-2',
-                    'text-sm leading-4 text-[#312e4d]',
-                    'rounded',
-                    'cursor-pointer',
-                    'select-none',
-                    'outline-none',
-                    'transition-colors',
-                    'hover:bg-[#f4f4f4]',
-                    value === option.id && 'bg-[#ecebf0]',
-                    isPrimary && 'whitespace-nowrap'
-                  )}
-                  onClick={() => handleSelectOption(option.id)}
-                  data-testid={`select-option-${option.id}`}
-                >
-                  <span className="flex-1">{option.text}</span>
-                  {value === option.id && (
-                    <Check size={16} className="text-[#00b56b] shrink-0" />
-                  )}
-                </div>
-              ))}
-            </div>
-          </Popover.Content>
-        </Popover.Portal>
-      </Popover.Root>
+        {errorMessage}
+      </div>
     );
   }
 );

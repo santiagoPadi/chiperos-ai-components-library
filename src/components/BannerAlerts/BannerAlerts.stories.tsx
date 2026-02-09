@@ -13,19 +13,39 @@ const meta = {
     variant: {
       control: 'select',
       options: ['warning', 'information', 'grey'],
-      description: 'Variante del banner alert',
+      description: 'Visual variant of the banner alert',
+      table: {
+        type: { summary: "'warning' | 'information' | 'grey'" },
+        defaultValue: { summary: "'information'" },
+      },
     },
     title: {
       control: 'text',
-      description: 'Título del alert',
+      description: 'Title of the alert banner',
+      table: {
+        type: { summary: 'string' },
+      },
     },
     description: {
       control: 'text',
-      description: 'Descripción del alert',
+      description: 'Description text of the alert banner',
+      table: {
+        type: { summary: 'string' },
+      },
     },
     icon: {
       control: false,
-      description: 'Icono personalizado',
+      description: 'Custom icon element (overrides the default variant icon)',
+      table: {
+        type: { summary: 'ReactNode' },
+      },
+    },
+    className: {
+      control: 'text',
+      description: 'Additional CSS classes',
+      table: {
+        type: { summary: 'string' },
+      },
     },
   },
 } satisfies Meta<typeof BannerAlerts>;

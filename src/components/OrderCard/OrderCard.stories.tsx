@@ -12,31 +12,90 @@ const meta = {
     state: {
       control: 'select',
       options: ['received', 'picking', 'dispatched', 'delivered'],
-      description: 'Estado de la orden',
+      description: 'Order state (each has its own icon)',
+      table: {
+        type: { summary: "'received' | 'picking' | 'dispatched' | 'delivered'" },
+      },
     },
     count: {
       control: 'number',
-      description: 'Cantidad de órdenes/rutas',
+      description: 'Number of orders / routes',
+      table: {
+        type: { summary: 'number' },
+      },
     },
     countLabel: {
       control: 'text',
-      description: 'Etiqueta de cantidad',
+      description: 'Label for the count value',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: "'orders'" },
+      },
     },
     grossSales: {
       control: 'number',
-      description: 'Ventas brutas',
+      description: 'Gross sales amount',
+      table: {
+        type: { summary: 'number' },
+      },
     },
     netSales: {
       control: 'number',
-      description: 'Ventas netas',
+      description: 'Net sales amount',
+      table: {
+        type: { summary: 'number' },
+      },
     },
     hasDelays: {
       control: 'boolean',
-      description: 'Mostrar badge de delays',
+      description: 'Whether to show the delays badge',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    delayCount: {
+      control: 'number',
+      description: 'Number of delays (shown in badge)',
+      table: {
+        type: { summary: 'number' },
+      },
+    },
+    onDelaysClick: {
+      action: 'delaysClicked',
+      description: 'Callback when the Delays badge is clicked',
+      table: {
+        type: { summary: '() => void' },
+      },
+    },
+    onFilterClick: {
+      action: 'filterClicked',
+      description: 'Callback when the Filter button is clicked',
+      table: {
+        type: { summary: '() => void' },
+      },
+    },
+    icon: {
+      control: false,
+      description: 'Custom icon element (overrides the default state icon)',
+      table: {
+        type: { summary: 'ReactNode' },
+      },
     },
     currencySymbol: {
       control: 'text',
-      description: 'Símbolo de moneda',
+      description: 'Currency symbol for sales values',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: "'$'" },
+      },
+    },
+    className: {
+      control: 'text',
+      description: 'Additional CSS classes',
+      table: {
+        type: { summary: 'string' },
+      },
     },
   },
 } satisfies Meta<typeof OrderCard>;

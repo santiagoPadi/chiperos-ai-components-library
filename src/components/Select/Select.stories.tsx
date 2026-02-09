@@ -12,36 +12,102 @@ const meta = {
   argTypes: {
     value: {
       control: 'text',
-      description: 'The currently selected option ID (string for single, array for multiple)',
+      description: 'Currently selected value (string for single, string[] for multiple)',
+      table: {
+        type: { summary: 'string | string[]' },
+      },
     },
     placeholder: {
       control: 'text',
       description: 'Placeholder text when no option is selected',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: "'Select an option'" },
+      },
     },
     label: {
       control: 'text',
-      description: 'Label shown above the selected value',
+      description: 'Label text shown above the selected value',
+      table: {
+        type: { summary: 'string' },
+      },
     },
     variant: {
       control: 'select',
       options: ['default', 'primary'],
-      description: 'Visual variant: default (white) or primary (green button style)',
+      description: 'Visual variant: default (white background) or primary (green button style)',
+      table: {
+        type: { summary: "'default' | 'primary'" },
+        defaultValue: { summary: "'default'" },
+      },
     },
     disabled: {
       control: 'boolean',
       description: 'Whether the select is disabled',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
     },
     multiple: {
       control: 'boolean',
-      description: 'Enable multiple selection mode',
+      description: 'Enable multiple selection mode (uses checkboxes)',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
     },
     options: {
       control: 'object',
-      description: 'Array of options {id, text}',
+      description: 'Array of options with id and text',
+      table: {
+        type: { summary: 'SelectOption[]' },
+      },
+    },
+    search: {
+      control: 'boolean',
+      description: 'Enable search functionality with debounced input',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'false' },
+      },
+    },
+    onSearch: {
+      action: 'searched',
+      description: 'Callback fired when search input changes (with 2s debounce)',
+      table: {
+        type: { summary: '(searchTerm: string) => void' },
+      },
+    },
+    searchPlaceholder: {
+      control: 'text',
+      description: 'Placeholder text for the search input',
+      table: {
+        type: { summary: 'string' },
+        defaultValue: { summary: "'Search...'" },
+      },
+    },
+    error: {
+      control: 'text',
+      description: 'Error message or state - shows red border when truthy. When a string is provided it is displayed below the select.',
+      table: {
+        type: { summary: 'string | boolean' },
+        defaultValue: { summary: 'undefined' },
+      },
     },
     onChange: {
       action: 'changed',
       description: 'Callback fired when selection changes',
+      table: {
+        type: { summary: '(value: string) => void | (values: string[]) => void' },
+      },
+    },
+    className: {
+      control: 'text',
+      description: 'Additional CSS classes',
+      table: {
+        type: { summary: 'string' },
+      },
     },
   },
 } satisfies Meta<typeof Select>;
@@ -129,6 +195,33 @@ export const DisabledWithValue: Story = {
     options: defaultOptions,
     value: '2',
     disabled: true,
+  },
+  render: (args) => <SelectWrapper {...args} />,
+};
+
+export const WithError: Story = {
+  args: {
+    options: defaultOptions,
+    placeholder: 'Select an option',
+    error: 'This field is required',
+  },
+  render: (args) => <SelectWrapper {...args} />,
+};
+
+export const WithErrorBoolean: Story = {
+  args: {
+    options: defaultOptions,
+    placeholder: 'Select an option',
+    error: true,
+  },
+  render: (args) => <SelectWrapper {...args} />,
+};
+
+export const WithErrorAndValue: Story = {
+  args: {
+    options: defaultOptions,
+    value: '1',
+    error: 'Invalid selection',
   },
   render: (args) => <SelectWrapper {...args} />,
 };

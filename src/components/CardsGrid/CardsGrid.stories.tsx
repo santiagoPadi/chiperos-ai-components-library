@@ -13,6 +13,52 @@ const meta = {
     layout: 'padded',
   },
   tags: ['autodocs'],
+  argTypes: {
+    columns: {
+      control: 'number',
+      description: 'Number of columns in the grid',
+      table: {
+        type: { summary: 'number' },
+      },
+    },
+    gap: {
+      control: 'number',
+      description: 'Gap between cards (Tailwind units or px)',
+      table: {
+        type: { summary: 'number | string' },
+        defaultValue: { summary: '4' },
+      },
+    },
+    tabletColumns: {
+      control: 'number',
+      description: 'Number of columns on tablets (responsive)',
+      table: {
+        type: { summary: 'number' },
+      },
+    },
+    mobileColumns: {
+      control: 'number',
+      description: 'Number of columns on mobile (responsive)',
+      table: {
+        type: { summary: 'number' },
+        defaultValue: { summary: '1' },
+      },
+    },
+    children: {
+      control: false,
+      description: 'Card components or other children to render in the grid',
+      table: {
+        type: { summary: 'ReactNode' },
+      },
+    },
+    className: {
+      control: 'text',
+      description: 'Additional CSS classes',
+      table: {
+        type: { summary: 'string' },
+      },
+    },
+  },
 } satisfies Meta<typeof CardsGrid>;
 
 export default meta;

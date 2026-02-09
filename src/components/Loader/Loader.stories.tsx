@@ -13,24 +13,51 @@ const meta = {
     type: {
       control: 'select',
       options: ['spinner', 'linear'],
-      description: 'Tipo de loader',
+      description: 'Type of loader: circular spinner or linear progress bar',
+      table: {
+        type: { summary: "'spinner' | 'linear'" },
+        defaultValue: { summary: "'spinner'" },
+      },
     },
     show: {
       control: 'boolean',
-      description: 'Controla la visibilidad del loader',
+      description: 'Controls the visibility of the loader',
+      table: {
+        type: { summary: 'boolean' },
+        defaultValue: { summary: 'true' },
+      },
     },
     variant: {
       control: 'select',
       options: ['active', 'disabled'],
-      description: 'Variante del loader',
+      description: 'Loader variant (active = green, disabled = grey)',
+      table: {
+        type: { summary: "'active' | 'disabled'" },
+        defaultValue: { summary: "'active'" },
+      },
     },
     size: {
       control: 'number',
-      description: 'Tamaño del spinner (solo para type="spinner")',
+      description: 'Size of the spinner in pixels (only for type="spinner")',
+      table: {
+        type: { summary: 'number' },
+        defaultValue: { summary: '48' },
+      },
     },
     width: {
       control: 'number',
-      description: 'Ancho de la barra (solo para type="linear")',
+      description: 'Width of the progress bar in pixels (only for type="linear")',
+      table: {
+        type: { summary: 'number' },
+        defaultValue: { summary: '230' },
+      },
+    },
+    className: {
+      control: 'text',
+      description: 'Additional CSS classes',
+      table: {
+        type: { summary: 'string' },
+      },
     },
   },
 } satisfies Meta<typeof Loader>;

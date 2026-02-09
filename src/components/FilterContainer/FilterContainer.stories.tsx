@@ -11,12 +11,118 @@ const meta: Meta<typeof FilterContainer> = {
     },
     tags: ['autodocs'],
     argTypes: {
-        onApply: { action: 'apply clicked' },
-        onSettingsOpen: { action: 'settings modal opened' },
-        onSettingsClose: { action: 'settings modal closed' },
-        onAdvancedFiltersApply: { action: 'advanced filters applied' },
-        onDownload: { action: 'download clicked' },
-        onRestart: { action: 'restart clicked' },
+        filters: {
+            control: false,
+            description: 'Array of filter definitions (select, multi-select, or dateRange)',
+            table: {
+                type: { summary: 'FilterContainerFilter[]' },
+                defaultValue: { summary: '[]' },
+            },
+        },
+        onApply: {
+            action: 'apply clicked',
+            description: 'Callback when Apply button is clicked',
+            table: {
+                type: { summary: '() => void' },
+            },
+        },
+        settingsModalContent: {
+            control: false,
+            description: 'Custom content for the settings modal (defaults to AdvancedFiltersContent)',
+            table: {
+                type: { summary: 'ReactNode' },
+            },
+        },
+        onSettingsOpen: {
+            action: 'settings modal opened',
+            description: 'Callback when the Settings modal opens',
+            table: {
+                type: { summary: '() => void' },
+            },
+        },
+        onSettingsClose: {
+            action: 'settings modal closed',
+            description: 'Callback when the Settings modal closes',
+            table: {
+                type: { summary: '() => void' },
+            },
+        },
+        onAdvancedFiltersApply: {
+            action: 'advanced filters applied',
+            description: 'Callback when advanced filters are applied (receives typed result)',
+            table: {
+                type: { summary: '(result: AdvancedFiltersResult) => void' },
+            },
+        },
+        initialAdvancedFilters: {
+            control: false,
+            description: 'Initial filters to load in the Advanced Filters modal',
+            table: {
+                type: { summary: 'CustomFilterData[]' },
+                defaultValue: { summary: '[]' },
+            },
+        },
+        onDownload: {
+            action: 'download clicked',
+            description: 'Callback when Download button is clicked',
+            table: {
+                type: { summary: '() => void' },
+            },
+        },
+        onRestart: {
+            action: 'restart clicked',
+            description: 'Callback when Restart button is clicked',
+            table: {
+                type: { summary: '() => void' },
+            },
+        },
+        applyLabel: {
+            control: 'text',
+            description: 'Custom label for the Apply button',
+            table: {
+                type: { summary: 'string' },
+                defaultValue: { summary: "'Apply'" },
+            },
+        },
+        applyDisabled: {
+            control: 'boolean',
+            description: 'Disable the Apply button',
+            table: {
+                type: { summary: 'boolean' },
+                defaultValue: { summary: 'false' },
+            },
+        },
+        settingsDisabled: {
+            control: 'boolean',
+            description: 'Disable the Settings button',
+            table: {
+                type: { summary: 'boolean' },
+                defaultValue: { summary: 'false' },
+            },
+        },
+        downloadDisabled: {
+            control: 'boolean',
+            description: 'Disable the Download button',
+            table: {
+                type: { summary: 'boolean' },
+                defaultValue: { summary: 'false' },
+            },
+        },
+        restartDisabled: {
+            control: 'boolean',
+            description: 'Disable the Restart button',
+            table: {
+                type: { summary: 'boolean' },
+                defaultValue: { summary: 'false' },
+            },
+        },
+        className: {
+            control: 'text',
+            description: 'Additional CSS classes',
+            table: {
+                type: { summary: 'string' },
+            },
+        },
     },
 };
 
