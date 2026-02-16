@@ -23,3 +23,4 @@ export * from './FilterContainer';
 export * from './ComposedChart';
 export * from './ProgressBarInfo';
 export * from './DateTimePicker';
+export * from './ImportModal';
